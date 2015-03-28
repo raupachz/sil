@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) 2015, Björn Raupach
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.sil;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Httpd extends Thread {
+
+    private final ExecutorService es;
+
+    public Httpd() {
+        super("httpd");
+        this.es = new HttpThreadPoolExecutor(10, 200, 60000, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void run() {
+        ServerSocketChannel ssc;
+        try {
+             ssc = ServerSocketChannel.open();
+            ssc.bind(new InetSocketAddress(8080));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                SocketChannel sc = ssc.accept();
+                sc.setOption(StandardSocketOptions.TCP_NODELAY, true);
+                HttpHandler hh = new HttpHandler(sc);
+                es.execute(hh);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    static class HttpThreadPoolExecutor extends ThreadPoolExecutor {
+
+        public HttpThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue(1024), new HttpThreadFactory());
+        }
+
+    }
+    
+    static class HttpThreadFactory implements ThreadFactory {
+        
+        private static final AtomicInteger counter = new AtomicInteger();
+
+        @Override
+        public Thread newThread(Runnable target) {
+            ThreadGroup group = Thread.currentThread().getThreadGroup();
+            String name = "http-" + counter.getAndIncrement();
+            return new HttpThread(group, target, name);
+        }
+        
+    }
+
+}
