@@ -31,6 +31,7 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.time.Instant;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,7 +64,7 @@ public class Httpd extends Thread {
             try {
                 SocketChannel sc = ssc.accept();
                 sc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-                HttpHandler hh = new HttpHandler(sc);
+                HttpHandler hh = new HttpHandler(sc, Instant.now());
                 es.execute(hh);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -75,7 +76,7 @@ public class Httpd extends Thread {
     static class HttpThreadPoolExecutor extends ThreadPoolExecutor {
 
         public HttpThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue(1024), new HttpThreadFactory());
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue(100), new HttpThreadFactory());
         }
 
     }

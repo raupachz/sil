@@ -25,50 +25,22 @@
  */
 package org.sil;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.time.Instant;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.URI;
 
-public class HttpHandler implements Runnable {
+/**
+ *
+ * @author Björn Raupach
+ */
+public class Request {
     
-    private final SocketChannel sc;
-    private final Instant connectedAt;
-    private final RequestDecoder decoder;
-    private final ResponseEncoder encoder;
-    
-    public HttpHandler(SocketChannel sc, Instant connectedAt) {
-        this.sc = sc;
-        this.connectedAt = connectedAt;
-        this.decoder = new RequestDecoder();
-        this.encoder = new ResponseEncoder();
-    }
-    
-    public HttpThread getThread() {
-        return (HttpThread) Thread.currentThread();
+    private final URI uri;
+
+    public Request(URI uri) {
+        this.uri = uri;
     }
 
-    @Override
-    public void run() {
-        // Start with a clear buffer
-        ByteBuffer requestBuffer = getThread().getRequestBuffer();
-        requestBuffer.clear();
-        try {
-            sc.read(requestBuffer);
-            Request request = decoder.decode(requestBuffer);
-            // Request -> Response
-            Response response = new Response(StatusCode.NotFound);
-            //
-            ByteBuffer responseBuffer = encoder.encode(response);
-            sc.write(responseBuffer);
-            sc.close();
-        } catch (IOException ex) {
-            Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    public URI getUri() {
+        return uri;
     }
-    
     
 }

@@ -27,48 +27,32 @@ package org.sil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class HttpHandler implements Runnable {
+public class ResponseEncoder {
     
-    private final SocketChannel sc;
-    private final Instant connectedAt;
-    private final RequestDecoder decoder;
-    private final ResponseEncoder encoder;
+    private static final byte sp = 32;
+    private static final byte cr = 13;
+    private static final byte lf = 10;
+            
     
-    public HttpHandler(SocketChannel sc, Instant connectedAt) {
-        this.sc = sc;
-        this.connectedAt = connectedAt;
-        this.decoder = new RequestDecoder();
-        this.encoder = new ResponseEncoder();
-    }
-    
-    public HttpThread getThread() {
-        return (HttpThread) Thread.currentThread();
-    }
-
-    @Override
-    public void run() {
-        // Start with a clear buffer
-        ByteBuffer requestBuffer = getThread().getRequestBuffer();
-        requestBuffer.clear();
-        try {
-            sc.read(requestBuffer);
-            Request request = decoder.decode(requestBuffer);
-            // Request -> Response
-            Response response = new Response(StatusCode.NotFound);
-            //
-            ByteBuffer responseBuffer = encoder.encode(response);
-            sc.write(responseBuffer);
-            sc.close();
-        } catch (IOException ex) {
-            Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public ByteBuffer encode(Response response) {
+        ByteBuffer responseBuffer = ByteBuffer.allocate(256);
         
+        responseBuffer.put(HttpVersion.Http11.getBytes());
+        responseBuffer.put(sp);
+        responseBuffer.put(response.getStatusCode().getCode());
+        responseBuffer.put(sp);
+        responseBuffer.put(response.getStatusCode().getReasonPhrase());
+        responseBuffer.put(cr);
+        responseBuffer.put(lf);
+        responseBuffer.put(cr);
+        responseBuffer.put(lf);
+        
+        // prepare buffer for writing
+        responseBuffer.flip();
+        return responseBuffer;
     }
-    
     
 }

@@ -58,7 +58,7 @@ public class Hex {
             out.write(NEWLINE);
         }
         
-        int left = limit % 16;
+        int left = limit % BYTES_PER_LINE;
         if (left > 0) {
             int padding = BYTES_PER_LINE - left;
             line(pos, out);

@@ -25,50 +25,21 @@
  */
 package org.sil;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-import java.time.Instant;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.charset.StandardCharsets;
 
-public class HttpHandler implements Runnable {
+public enum HttpVersion {
     
-    private final SocketChannel sc;
-    private final Instant connectedAt;
-    private final RequestDecoder decoder;
-    private final ResponseEncoder encoder;
+    Http10("HTTP/1.0".getBytes(StandardCharsets.UTF_8)),
+    Http11("HTTP/1.1".getBytes(StandardCharsets.UTF_8));
     
-    public HttpHandler(SocketChannel sc, Instant connectedAt) {
-        this.sc = sc;
-        this.connectedAt = connectedAt;
-        this.decoder = new RequestDecoder();
-        this.encoder = new ResponseEncoder();
+    private final byte[] bytes;
+    
+    HttpVersion(byte[] bytes) {
+        this.bytes = bytes;
     }
     
-    public HttpThread getThread() {
-        return (HttpThread) Thread.currentThread();
+    public byte[] getBytes() {
+        return bytes;
     }
-
-    @Override
-    public void run() {
-        // Start with a clear buffer
-        ByteBuffer requestBuffer = getThread().getRequestBuffer();
-        requestBuffer.clear();
-        try {
-            sc.read(requestBuffer);
-            Request request = decoder.decode(requestBuffer);
-            // Request -> Response
-            Response response = new Response(StatusCode.NotFound);
-            //
-            ByteBuffer responseBuffer = encoder.encode(response);
-            sc.write(responseBuffer);
-            sc.close();
-        } catch (IOException ex) {
-            Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-    
     
 }

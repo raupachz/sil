@@ -47,10 +47,10 @@ public class Getopt {
     private final String[] args;
     private final String optstring;
 
-    int optind;
-    char optopt;
-    String optarg;
-    int sp;
+    private int optind;
+    private char optopt;
+    private String optarg;
+    private int sp;
     
     public Getopt(String[] args, String optstring) {
         Objects.requireNonNull(args);

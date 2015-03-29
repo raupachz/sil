@@ -25,10 +25,67 @@
  */
 package org.sil;
 
+import java.io.PrintStream;
+import static java.lang.System.*;
+
 public class Main {
 
-    public static void main(String args[]) {
-        // NOOP
+    private static final PrintStream out = System.out;
+
+    public static void main(String args[]) throws InterruptedException {
+        Getopt g = new Getopt(args, "hp:v");
+        int ch;
+        while ((ch = g.getopt()) != -1) {
+            switch (ch) {
+                case 'h':
+                    usage();
+                    System.exit(0);
+                case 'v':
+                    version();
+                    System.exit(0);
+                case '?':
+                    System.out.println("Unrecognized option: -" + g.getOptopt());
+                    System.exit(0);
+            }
+        }
+
+        final Httpd httpd = new Httpd();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                httpd.interrupt();
+            }
+        });
+
+        httpd.start();
+    }
+
+    static void usage() {
+        out.println("usage: java -jar sil.jar [options] [path]");
+        out.println();
+        out.println("Options:");
+        out.println("  -h                 Display help information");
+        out.println("  -p                 Port to use, default is 8080");
+        out.println("  -v                 Display version information");
+    }
+
+    static void version() {
+        out.println("sil <version> <sha1>; ISOUTC");
+        out.print("Java version: ");
+        out.print(getProperty("java.version"));
+        out.print(", vendor: ");
+        out.println(getProperty("java.vendor"));
+        out.print("Java home: ");
+        out.println(getProperty("java.home"));
+        out.print("OS name: \"");
+        out.print(getProperty("os.name"));
+        out.print("\", version: \"");
+        out.print(getProperty("os.version"));
+        out.print("\", arch: \"");
+        out.print(getProperty("os.arch"));
+        out.println("\"");
     }
 
 }
