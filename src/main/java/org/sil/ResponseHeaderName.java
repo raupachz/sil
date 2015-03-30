@@ -25,28 +25,22 @@
  */
 package org.sil;
 
-import java.nio.ByteBuffer;
-
-/**
- * An execution environment for {@code HttpHandler}.
- */
-public class HttpThread extends Thread {
+public enum ResponseHeaderName {
     
-    private static final ThreadLocal<ByteBuffer> threadLocal = new ThreadLocal<ByteBuffer>() {
-
-        @Override
-        protected ByteBuffer initialValue() {
-            return ByteBuffer.allocateDirect(4096);
-        }
-        
-    };
-
-    HttpThread(ThreadGroup group, Runnable target, String name) {
-        super(group, target, name);
+    ContentLength("Content-Length"),
+    Connection("Connection"),
+    Date("Date"),
+    Server("Server");
+    
+    private final String header;
+    
+    ResponseHeaderName(String header) {
+        this.header = header;
     }
     
-    public ByteBuffer getBuffer() {
-        return threadLocal.get();
+    @Override
+    public String toString() {
+        return header;
     }
     
 }

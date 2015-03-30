@@ -53,13 +53,13 @@ public class HttpHandler implements Runnable {
     @Override
     public void run() {
         // Start with a clear buffer
-        ByteBuffer requestBuffer = getThread().getRequestBuffer();
+        ByteBuffer requestBuffer = getThread().getBuffer();
         requestBuffer.clear();
         try {
             sc.read(requestBuffer);
             Request request = decoder.decode(requestBuffer);
             // Request -> Response
-            Response response = new Response(StatusCode.NotFound);
+            Response response = new Response(Status.NotFound);
             //
             ByteBuffer responseBuffer = encoder.encode(response);
             sc.write(responseBuffer);

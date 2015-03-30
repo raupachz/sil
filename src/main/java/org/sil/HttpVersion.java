@@ -25,21 +25,19 @@
  */
 package org.sil;
 
-import java.nio.charset.StandardCharsets;
-
 public enum HttpVersion {
     
-    Http10("HTTP/1.0".getBytes(StandardCharsets.UTF_8)),
-    Http11("HTTP/1.1".getBytes(StandardCharsets.UTF_8));
+    Http11("HTTP/1.1");
     
-    private final byte[] bytes;
+    private final String version;
     
-    HttpVersion(byte[] bytes) {
-        this.bytes = bytes;
+    HttpVersion(String version) {
+        this.version = version;
     }
     
-    public byte[] getBytes() {
-        return bytes;
+    @Override
+    public String toString() {
+        return version;
     }
     
 }

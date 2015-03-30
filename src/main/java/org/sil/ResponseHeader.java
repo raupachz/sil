@@ -25,28 +25,44 @@
  */
 package org.sil;
 
-import java.nio.charset.StandardCharsets;
+import java.io.Serializable;
+import java.util.Objects;
 
-public enum StatusCode {
+public final class ResponseHeader implements Serializable {
     
-    NoContent(204, "No content"),
-    NotFound(404, "Not Found");
-    
-    private final byte[] code;
-    private final byte[] reasonPhrase;
-    
-    StatusCode(int code, String resonPhrase) {
-        this.code = String.valueOf(code).getBytes(StandardCharsets.UTF_8);
-        this.reasonPhrase = resonPhrase.getBytes(StandardCharsets.UTF_8);
+    private final ResponseHeaderName name;
+    private final String value;
+
+    public ResponseHeader(ResponseHeaderName name, String value) {
+        this.name = name;
+        this.value = value;
     }
-    
-    public byte[] getCode() {
-        return code;
+
+    public ResponseHeaderName getName() {
+        return name;
     }
-    
-    public byte[] getReasonPhrase() {
-        return reasonPhrase;
+
+    public String getValue() {
+        return value;
     }
-   
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ResponseHeader other = (ResponseHeader) obj;
+        return this.name == other.name;
+    }
     
 }

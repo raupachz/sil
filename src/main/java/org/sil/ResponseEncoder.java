@@ -25,34 +25,45 @@
  */
 package org.sil;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.charset.StandardCharsets;
 
 public class ResponseEncoder {
     
     private static final byte sp = 32;
     private static final byte cr = 13;
     private static final byte lf = 10;
-            
     
     public ByteBuffer encode(Response response) {
-        ByteBuffer responseBuffer = ByteBuffer.allocate(256);
-        
-        responseBuffer.put(HttpVersion.Http11.getBytes());
-        responseBuffer.put(sp);
-        responseBuffer.put(response.getStatusCode().getCode());
-        responseBuffer.put(sp);
-        responseBuffer.put(response.getStatusCode().getReasonPhrase());
-        responseBuffer.put(cr);
-        responseBuffer.put(lf);
-        responseBuffer.put(cr);
-        responseBuffer.put(lf);
-        
+        // allocate heap buffer
+        ByteBuffer bb = ByteBuffer.allocate(4096);
+        // write response to buffer
+        statusLine(response, bb);
+        responseHeaders(response, bb);
+        empyLine(bb);
         // prepare buffer for writing
-        responseBuffer.flip();
-        return responseBuffer;
+        bb.flip();
+        return bb;
+    }
+    
+    void statusLine(Response response, ByteBuffer bb) {
+        bb.put(HttpVersion.Http11.toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(sp);
+        bb.put(response.getStatus().toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(cr);
+        bb.put(lf);
+    }
+    
+    void responseHeaders(Response response, ByteBuffer bb) {
+        for (ResponseHeader rh : response.getResponseHeaders()) {
+            
+        }
+        
+    }
+    
+    void empyLine(ByteBuffer bb) {
+        bb.put(cr);
+        bb.put(lf);
     }
     
 }

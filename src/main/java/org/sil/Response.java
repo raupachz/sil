@@ -25,16 +25,34 @@
  */
 package org.sil;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class Response {
     
-    private final StatusCode statusCode;
+    private final Status status;
+    private final List<ResponseHeader> responseHeaders;
     
-    public Response(StatusCode statusCode) {
-        this.statusCode = statusCode;
+    public Response(Status status) {
+        this.status = status;
+        this.responseHeaders = new ArrayList<>();
     }
     
-    public StatusCode getStatusCode() {
-        return statusCode;
+    public Status getStatus() {
+        return status;
+    }
+    
+    public void addHeader(ResponseHeader header) {
+        responseHeaders.add(header);
+    }
+    
+    public void removeHeader(ResponseHeader header) {
+        responseHeaders.remove(header);
+    }
+    
+    public Collection<ResponseHeader> getResponseHeaders() {
+        return responseHeaders;
     }
     
 }
