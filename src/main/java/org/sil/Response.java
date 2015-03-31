@@ -28,19 +28,24 @@ package org.sil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import static org.sil.ResponseHeaderName.*;
 
 public class Response {
     
-    private final Status status;
     private final List<ResponseHeader> responseHeaders;
     
-    public Response(Status status) {
-        this.status = status;
+    private Status status;
+    
+    public Response() {
         this.responseHeaders = new ArrayList<>();
     }
     
     public Status getStatus() {
         return status;
+    }
+    
+    public void setStatus(Status status) {
+        this.status = status;
     }
     
     public void addHeader(ResponseHeader header) {
@@ -53,6 +58,19 @@ public class Response {
     
     public Collection<ResponseHeader> getResponseHeaders() {
         return responseHeaders;
+    }
+    
+    public static Response blank() {
+        return new Response();
+    }
+    
+    public static Response of(Status status) {
+        Response res = new Response();
+        res.setStatus(status);
+        res.addHeader(new ResponseHeader(Server, "sil"));
+        res.addHeader(new ResponseHeader(ContentLength, "0"));
+        res.addHeader(new ResponseHeader(Connection, "close"));
+        return res;
     }
     
 }
