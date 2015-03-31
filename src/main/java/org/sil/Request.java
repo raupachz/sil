@@ -27,10 +27,6 @@ package org.sil;
 
 import java.net.URI;
 
-/**
- *
- * @author Björn Raupach
- */
 public class Request {
     
     private final URI uri;

@@ -30,9 +30,10 @@ import java.nio.charset.StandardCharsets;
 
 public class ResponseEncoder {
     
-    private static final byte sp = 32;
-    private static final byte cr = 13;
-    private static final byte lf = 10;
+    private static final byte sp = 32; // SPACE
+    private static final byte cr = 13; // \r
+    private static final byte lf = 10; // \n
+    private static final byte cl = 58; // :
     
     public ByteBuffer encode(Response response) {
         // allocate heap buffer
@@ -56,9 +57,13 @@ public class ResponseEncoder {
     
     void responseHeaders(Response response, ByteBuffer bb) {
         for (ResponseHeader rh : response.getResponseHeaders()) {
-            
+            bb.put(rh.getName().toString().getBytes(StandardCharsets.UTF_8));
+            bb.put(cl);
+            bb.put(sp);
+            bb.put(rh.getValue().getBytes(StandardCharsets.UTF_8));
+            bb.put(cr);
+            bb.put(lf);
         }
-        
     }
     
     void empyLine(ByteBuffer bb) {

@@ -25,6 +25,10 @@
  */
 package org.sil;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -68,8 +72,14 @@ public class Response {
         Response res = new Response();
         res.setStatus(status);
         res.addHeader(new ResponseHeader(Server, "sil"));
-        res.addHeader(new ResponseHeader(ContentLength, "0"));
         res.addHeader(new ResponseHeader(Connection, "close"));
+        res.addHeader(new ResponseHeader(ContentLength, "0"));
+        
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("GMT"));
+        String dateValue = DateTimeFormatter.RFC_1123_DATE_TIME.format(now);
+        
+        res.addHeader(new ResponseHeader(Date, dateValue));
+        
         return res;
     }
     

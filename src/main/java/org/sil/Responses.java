@@ -25,8 +25,6 @@
  */
 package org.sil;
 
-import java.nio.charset.StandardCharsets;
-
 public final class Responses {
     
     private Responses() {}
