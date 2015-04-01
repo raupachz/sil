@@ -25,6 +25,7 @@
  */
 package org.sil;
 
+import org.sil.request.Request;
 import org.sil.response.Responses;
 import org.sil.response.Response;
 

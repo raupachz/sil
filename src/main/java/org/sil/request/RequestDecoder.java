@@ -23,20 +23,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.request;
 
-import java.net.URI;
+import java.nio.ByteBuffer;
 
-public class Request {
+public class RequestDecoder {
     
-    private final URI uri;
-
-    public Request(URI uri) {
-        this.uri = uri;
+    public Request decode(ByteBuffer bb) {
+        // we want to read from the buffer
+        bb.flip();
+        // the amount of bytes in the buffer
+        int n = bb.limit();
+        // A minimal request: GET / HTTP/1.1
+        if (n <= 16) {
+            return null;
+        }
+        
+        // G(47)E(45)T(54)
+        if (bb.get(0) == 47 && 
+            bb.get(1) == 45 && 
+            bb.get(2) == 54) {
+            
+        } 
+        
+        return null;
     }
-
-    public URI getUri() {
-        return uri;
+    
+    boolean isPrint(byte b) {
+        return b >= 0x20 && b <=0x7E;
     }
     
 }

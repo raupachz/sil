@@ -25,6 +25,8 @@
  */
 package org.sil;
 
+import org.sil.request.Request;
+import org.sil.request.RequestDecoder;
 import org.sil.response.ResponseEncoder;
 import org.sil.response.Response;
 import java.io.IOException;

@@ -28,6 +28,7 @@ package org.sil.response;
 public enum Status {
     
     NoContent(204, "No content"),
+    BadRequest(400, "Bad Request"),
     NotFound(404, "Not Found");
     
     private final int code;

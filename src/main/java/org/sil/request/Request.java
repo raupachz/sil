@@ -23,23 +23,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.request;
 
-import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
-public class RequestDecoder {
+public class Request {
     
-    public Request decode(ByteBuffer b) {
-        b.flip();
-        int pos = b.position();
-        int limit = b.limit();
-        
-        // G(47)E(45)T(54)
-        if (b.get(0) == 47 && b.get(1) == 45 && b.get(2) == 54) {
-            
-        } 
-        
-        return null;
+    public static enum Method {
+        GET
+    }
+    
+    private Method method;
+    private Path path;
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
     }
     
 }

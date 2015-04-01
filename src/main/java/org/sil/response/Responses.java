@@ -29,7 +29,10 @@ public final class Responses {
     
     private Responses() {}
     
+    public static Response BadRequest = Response.of(Status.BadRequest);
     public static Response NotFound = Response.of(Status.NotFound);
+    
+    
     
     
 }
