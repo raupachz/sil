@@ -55,11 +55,14 @@ public class Main {
 
             @Override
             public void run() {
+                out.println("Stopping sil");
                 httpd.interrupt();
             }
         });
 
+        out.println("Starting sil/1.0 on port 8080 with directory .");
         httpd.start();
+        out.println("Hit CTRL-C to stop");
     }
 
     static void usage() {

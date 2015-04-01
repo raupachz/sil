@@ -23,46 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.response;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-public final class ResponseHeader implements Serializable {
+public enum Status {
     
-    private final ResponseHeaderName name;
-    private final String value;
-
-    public ResponseHeader(ResponseHeaderName name, String value) {
-        this.name = name;
-        this.value = value;
+    NoContent(204, "No content"),
+    NotFound(404, "Not Found");
+    
+    private final int code;
+    private final String reasonPhrase;
+    
+    Status(int code, String resonPhrase) {
+        this.code = code;
+        this.reasonPhrase = resonPhrase;
     }
-
-    public ResponseHeaderName getName() {
-        return name;
+    
+    public int getCode() {
+        return code;
     }
-
-    public String getValue() {
-        return value;
+    
+    public String getReasonPhrase() {
+        return reasonPhrase;
     }
-
+    
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.name);
-        return hash;
+    public String toString() {
+        return new StringBuilder(32)
+                .append(code)
+                .append(" ")
+                .append(reasonPhrase)
+                .toString();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ResponseHeader other = (ResponseHeader) obj;
-        return this.name == other.name;
-    }
+   
     
 }

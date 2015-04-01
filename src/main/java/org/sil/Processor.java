@@ -25,6 +25,9 @@
  */
 package org.sil;
 
+import org.sil.response.Responses;
+import org.sil.response.Response;
+
 /**
  * HTTP Request-Response Processor 
  */

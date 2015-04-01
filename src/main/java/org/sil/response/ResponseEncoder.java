@@ -23,37 +23,53 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.response;
 
-public enum Status {
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import org.sil.HttpVersion;
+
+public class ResponseEncoder {
     
-    NoContent(204, "No content"),
-    NotFound(404, "Not Found");
+    private static final byte sp = 32; // SPACE
+    private static final byte cr = 13; // \r
+    private static final byte lf = 10; // \n
+    private static final byte cl = 58; // :
     
-    private final int code;
-    private final String reasonPhrase;
-    
-    Status(int code, String resonPhrase) {
-        this.code = code;
-        this.reasonPhrase = resonPhrase;
+    public ByteBuffer encode(Response response) {
+        // allocate heap buffer
+        ByteBuffer bb = ByteBuffer.allocate(4096);
+        // write response to buffer
+        statusLine(response, bb);
+        responseHeaders(response, bb);
+        empyLine(bb);
+        // prepare buffer for writing
+        bb.flip();
+        return bb;
     }
     
-    public int getCode() {
-        return code;
+    void statusLine(Response response, ByteBuffer bb) {
+        bb.put(HttpVersion.Http11.toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(sp);
+        bb.put(response.getStatus().toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(cr);
+        bb.put(lf);
     }
     
-    public String getReasonPhrase() {
-        return reasonPhrase;
+    void responseHeaders(Response response, ByteBuffer bb) {
+        for (ResponseHeader rh : response.getResponseHeaders()) {
+            bb.put(rh.getName().toString().getBytes(StandardCharsets.UTF_8));
+            bb.put(cl);
+            bb.put(sp);
+            bb.put(rh.getValue().getBytes(StandardCharsets.UTF_8));
+            bb.put(cr);
+            bb.put(lf);
+        }
     }
     
-    @Override
-    public String toString() {
-        return new StringBuilder(32)
-                .append(code)
-                .append(" ")
-                .append(reasonPhrase)
-                .toString();
+    void empyLine(ByteBuffer bb) {
+        bb.put(cr);
+        bb.put(lf);
     }
-   
     
 }

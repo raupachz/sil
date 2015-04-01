@@ -23,13 +23,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.response;
 
-public final class Responses {
+public enum ResponseHeaderName {
     
-    private Responses() {}
+    ContentLength("Content-Length"),
+    Connection("Connection"),
+    Date("Date"),
+    Server("Server");
     
-    public static Response NotFound = Response.of(Status.NotFound);
+    private final String header;
     
+    ResponseHeaderName(String header) {
+        this.header = header;
+    }
+    
+    @Override
+    public String toString() {
+        return header;
+    }
     
 }

@@ -23,52 +23,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.response;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.io.Serializable;
+import java.util.Objects;
 
-public class ResponseEncoder {
+public final class ResponseHeader implements Serializable {
     
-    private static final byte sp = 32; // SPACE
-    private static final byte cr = 13; // \r
-    private static final byte lf = 10; // \n
-    private static final byte cl = 58; // :
-    
-    public ByteBuffer encode(Response response) {
-        // allocate heap buffer
-        ByteBuffer bb = ByteBuffer.allocate(4096);
-        // write response to buffer
-        statusLine(response, bb);
-        responseHeaders(response, bb);
-        empyLine(bb);
-        // prepare buffer for writing
-        bb.flip();
-        return bb;
+    private final ResponseHeaderName name;
+    private final String value;
+
+    public ResponseHeader(ResponseHeaderName name, String value) {
+        this.name = name;
+        this.value = value;
     }
-    
-    void statusLine(Response response, ByteBuffer bb) {
-        bb.put(HttpVersion.Http11.toString().getBytes(StandardCharsets.UTF_8));
-        bb.put(sp);
-        bb.put(response.getStatus().toString().getBytes(StandardCharsets.UTF_8));
-        bb.put(cr);
-        bb.put(lf);
+
+    public ResponseHeaderName getName() {
+        return name;
     }
-    
-    void responseHeaders(Response response, ByteBuffer bb) {
-        for (ResponseHeader rh : response.getResponseHeaders()) {
-            bb.put(rh.getName().toString().getBytes(StandardCharsets.UTF_8));
-            bb.put(cl);
-            bb.put(sp);
-            bb.put(rh.getValue().getBytes(StandardCharsets.UTF_8));
-            bb.put(cr);
-            bb.put(lf);
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
-    }
-    
-    void empyLine(ByteBuffer bb) {
-        bb.put(cr);
-        bb.put(lf);
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ResponseHeader other = (ResponseHeader) obj;
+        return this.name == other.name;
     }
     
 }

@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.response;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -32,7 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static org.sil.ResponseHeaderName.*;
+import static org.sil.response.ResponseHeaderName.*;
 
 public class Response {
     
