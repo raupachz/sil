@@ -34,7 +34,7 @@ public class Request {
     }
     
     private Method method;
-    private Path path;
+    private String path;
 
     public Method getMethod() {
         return method;
@@ -44,11 +44,11 @@ public class Request {
         this.method = method;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
     

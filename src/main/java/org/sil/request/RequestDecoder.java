@@ -26,31 +26,59 @@
 package org.sil.request;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.Objects;
+import org.sil.request.Request.Method;
 
 public class RequestDecoder {
     
+    private static final byte G = 71;
+    private static final byte E = 69;
+    private static final byte T = 84;
+    
+    private static final byte sp = 32; // SPACE
+    private static final byte cr = 13; // \r
+    private static final byte lf = 10; // \n
+    private static final byte cl = 58; // :
+    private static final byte sl = 47; // /
+    
     public Request decode(ByteBuffer bb) {
+        Objects.requireNonNull(bb);
+        // Return value
+        Request req = null;
         // we want to read from the buffer
-        bb.flip();
+        int i = 0;
         // the amount of bytes in the buffer
-        int n = bb.limit();
-        // A minimal request: GET / HTTP/1.1
-        if (n <= 16) {
+        final int limit = bb.limit();
+        // A minimal request: GET / HTTP/1.1 (16 bytes)
+        if (limit - i <= 16) {
             return null;
         }
-        
-        // G(47)E(45)T(54)
-        if (bb.get(0) == 47 && 
-            bb.get(1) == 45 && 
-            bb.get(2) == 54) {
-            
+        // Idk about this one, I try to avoid bb.get()
+        byte[] b = bb.array();
+
+        if (b[i++] == G && 
+            b[i++] == E && 
+            b[i++] == T &&
+            b[i++] == sp) {
+            // store current offset;
+            int offset = i;
+            // Read until next space byte or eof
+            while (b[i] != sp && i++ < limit);
+            // Did we reach the limit?
+            if (i == limit) {
+                return null;
+            }
+            // Read path
+            String path = new String(b, offset, i - offset, StandardCharsets.UTF_8);
+            // Return request object with parsed values
+            req = new Request();
+            req.setMethod(Method.GET);
+            req.setPath(path);
         } 
         
-        return null;
-    }
-    
-    boolean isPrint(byte b) {
-        return b >= 0x20 && b <=0x7E;
+        return req;
     }
     
 }

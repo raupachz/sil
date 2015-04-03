@@ -25,6 +25,7 @@
  */
 package org.sil;
 
+import org.sil.util.Getopt;
 import java.io.PrintStream;
 import static java.lang.System.*;
 

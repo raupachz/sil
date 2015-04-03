@@ -37,7 +37,7 @@
  * directly from AT&T.  The people there assure me that it is indeed
  * in the public domain.
  */
-package org.sil;
+package org.sil.util;
 
 import java.util.Arrays;
 import java.util.Objects;
