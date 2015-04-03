@@ -33,6 +33,7 @@ import java.nio.channels.SocketChannel;
 import java.time.Instant;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +75,7 @@ public class Httpd extends Thread {
     static class HttpThreadPoolExecutor extends ThreadPoolExecutor {
 
         public HttpThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
-            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue(100), new HttpThreadFactory());
+            super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new ArrayBlockingQueue(100), new HttpThreadFactory(), new DefaultRejectedExecutionHandler());
         }
 
     }
@@ -88,6 +89,15 @@ public class Httpd extends Thread {
             ThreadGroup group = Thread.currentThread().getThreadGroup();
             String name = "http-" + counter.getAndIncrement();
             return new HttpThread(group, target, name);
+        }
+        
+    }
+    
+    static class DefaultRejectedExecutionHandler implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable target, ThreadPoolExecutor executor) {
+            // this should yield some exception...
         }
         
     }
