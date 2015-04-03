@@ -56,8 +56,16 @@ public class TestRequestDecoder {
     }
     
     @Test
-    public void test_decode_garbage() {
-        String request = "938544562809809830945";
+    public void test_decode_partial_garbage() {
+        String request = "GET 938544562809809830945";
+        ByteBuffer bb = utf8.encode(request);
+        Request req = decoder.decode(bb);
+        assertNull(req);
+    }
+    
+    @Test
+    public void test_decode_total_garbage() {
+        String request = "234938544562809809830945";
         ByteBuffer bb = utf8.encode(request);
         Request req = decoder.decode(bb);
         assertNull(req);

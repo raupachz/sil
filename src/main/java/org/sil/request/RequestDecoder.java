@@ -56,28 +56,25 @@ public class RequestDecoder {
             return null;
         }
         // Idk about this one, I try to avoid bb.get()
-        byte[] b = bb.array();
+        byte[] ba = bb.array();
 
-        if (b[i++] == G && 
-            b[i++] == E && 
-            b[i++] == T &&
-            b[i++] == sp) {
+        if (ba[i++] == G && 
+            ba[i++] == E && 
+            ba[i++] == T &&
+            ba[i++] == sp) {
             // store current offset;
             int offset = i;
             // Read until next space byte or eof
-            while (b[i] != sp && i++ < limit);
+            while (ba[i] != sp && ++i < limit);
             // Did we reach the limit?
             if (i == limit) {
                 return null;
             }
             // Read path
-            String path = new String(b, offset, i - offset, StandardCharsets.UTF_8);
+            String path = new String(ba, offset, i - offset, StandardCharsets.UTF_8);
             // Return request object with parsed values
-            req = new Request();
-            req.setMethod(Method.GET);
-            req.setPath(path);
+            req = new Request(Method.GET, path);
         } 
-        
         return req;
     }
     

@@ -25,31 +25,27 @@
  */
 package org.sil.request;
 
-import java.nio.file.Path;
-
-public class Request {
+public final class Request {
     
-    public static enum Method {
-        GET
+    private final Method method;
+    private final String path;
+    
+    public Request(Method method, String path) {
+        this.method = method;
+        this.path = path;
     }
-    
-    private Method method;
-    private String path;
 
     public Method getMethod() {
         return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
     }
 
     public String getPath() {
         return path;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public static enum Method {
+        GET,
+        HEAD
     }
     
 }
