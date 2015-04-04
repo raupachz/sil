@@ -23,29 +23,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.request;
+package org.sil.entity;
 
-public final class Request {
+import java.nio.file.Path;
+import java.time.Instant;
+
+public interface Entity {
     
-    private final Method method;
-    private final String rawURI;
+    public Path getPath();
     
-    public Request(Method method, String rawURI) {
-        this.method = method;
-        this.rawURI = rawURI;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public String gerRawURI() {
-        return rawURI;
-    }
-
-    public static enum Method {
-        GET,
-        HEAD
-    }
+    public Instant getLastModified();
+    
+    public long getSize();
+    
+    public String getContentType();
     
 }

@@ -23,29 +23,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.request;
+package org.sil.entity;
 
-public final class Request {
-    
-    private final Method method;
-    private final String rawURI;
-    
-    public Request(Method method, String rawURI) {
-        this.method = method;
-        this.rawURI = rawURI;
+import java.nio.file.Path;
+import java.time.Instant;
+
+class DefaultEntity implements Entity {
+
+    @Override
+    public Path getPath() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Method getMethod() {
-        return method;
+    @Override
+    public Instant getLastModified() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public String gerRawURI() {
-        return rawURI;
+    @Override
+    public long getSize() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static enum Method {
-        GET,
-        HEAD
+    @Override
+    public String getContentType() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

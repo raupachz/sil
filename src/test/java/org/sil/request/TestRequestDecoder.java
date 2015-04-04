@@ -28,9 +28,7 @@ package org.sil.request;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import org.sil.request.Request;
 import org.sil.request.Request.Method;
-import org.sil.request.RequestDecoder;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 import org.testng.annotations.BeforeMethod;
@@ -87,7 +85,7 @@ public class TestRequestDecoder {
         
         assertNotNull(req);
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getPath(), "/");
+        assertEquals(req.gerRawURI(), "/");
     }
     
     @Test
@@ -98,7 +96,7 @@ public class TestRequestDecoder {
         
         assertNotNull(req);
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getPath(), "/index.html");
+        assertEquals(req.gerRawURI(), "/index.html");
     }
     
     @Test
@@ -109,7 +107,7 @@ public class TestRequestDecoder {
         
         assertNotNull(req);
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getPath(), "/a/b/c");
+        assertEquals(req.gerRawURI(), "/a/b/c");
     }
     
      
