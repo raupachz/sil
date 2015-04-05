@@ -23,44 +23,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.entity;
+package org.sil.util;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
+import java.nio.file.spi.FileTypeDetector;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-final class DefaultEntity implements Entity {
-    
-    private final Path physicalPath;
-    private final Instant lastModified;
-    private final long size;
-    private final String contentType;
+public class ApacheFileTypeDetector extends FileTypeDetector {
 
-    DefaultEntity(Path physicalPath, Instant lastModified, long size, String contentType) {
-        this.physicalPath = physicalPath;
-        this.lastModified = lastModified;
-        this.size = size;
-        this.contentType = contentType;
+    private String[] mimeTypes;
+    private String[] extensions;
+
+    void loadMimeTypes(Path path) throws IOException {
+        Charset utf8 = StandardCharsets.UTF_8;
+        List<String> lines = Files.lines(path, utf8)
+                                .filter(l -> !l.startsWith("#"))
+                                .collect(Collectors.toList());
+        extensions = new String[lines.size()];
+        mimeTypes = new String[lines.size()];
+        for (int i = 0; i < lines.size(); i++) {
+            String[] tokens = lines.get(i).split("\\s+");
+            mimeTypes[i] = tokens[0];
+            extensions[i] = tokens[1];
+        }
     }
     
-    @Override
-    public Path getPhysicalPath() {
-        return physicalPath;
+    String probeMimeType(String extension) {
+        int idx = Arrays.binarySearch(extensions, extension);
+        return idx < 0 ? null : mimeTypes[idx];
     }
 
     @Override
-    public Instant getLastModified() {
-        return lastModified;
+    public String probeContentType(Path path) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public long getSize() {
-        return size;
-    }
-
-    @Override
-    public String getContentType() {
-        return contentType;
-    }
-    
 }

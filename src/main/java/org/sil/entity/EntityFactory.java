@@ -25,12 +25,49 @@
  */
 package org.sil.entity;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
 
 public class EntityFactory {
     
-    public Entity of(Path path) {
-        return new DefaultEntity();
+    private final Path root;
+    
+    public EntityFactory(Path root) {
+        this.root = root;
+    }
+    
+    public Optional<Entity> get(String rawURI) throws IOException {
+        Objects.requireNonNull(rawURI);
+        
+        Path physicalPath = physicalPathOf(rawURI);
+        
+        if (!Files.exists(physicalPath, LinkOption.NOFOLLOW_LINKS)
+                || Files.isDirectory(physicalPath, LinkOption.NOFOLLOW_LINKS)) {
+            return Optional.empty();
+        }
+        
+        long size = Files.size(physicalPath);
+        Instant lastModified = Files.getLastModifiedTime(physicalPath, LinkOption.NOFOLLOW_LINKS).toInstant();
+        String contentType = Files.probeContentType(physicalPath);
+        
+        Entity entity = new DefaultEntity(physicalPath, lastModified, size, contentType);
+        return Optional.of(entity);
+    }
+    
+    Path physicalPathOf(String rawURI) {
+        if (rawURI.charAt(0) == '/') {
+            if (rawURI.length() > 1) {
+                rawURI = rawURI.substring(1);
+            } else {
+                rawURI = "";
+            }
+        }
+        return root.resolve(rawURI);
     }
     
 }

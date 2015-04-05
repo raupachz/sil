@@ -27,6 +27,7 @@ package org.sil.response;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import org.sil.HttpVersion;
 
 public class ResponseEncoder {
@@ -42,6 +43,7 @@ public class ResponseEncoder {
         // write response to buffer
         statusLine(response, bb);
         responseHeaders(response, bb);
+        entity(response, bb);
         empyLine(bb);
         // prepare buffer for writing
         bb.flip();
@@ -65,6 +67,10 @@ public class ResponseEncoder {
             bb.put(cr);
             bb.put(lf);
         }
+    }
+    
+    private void entity(Response response, ByteBuffer bb) {
+        
     }
     
     void empyLine(ByteBuffer bb) {

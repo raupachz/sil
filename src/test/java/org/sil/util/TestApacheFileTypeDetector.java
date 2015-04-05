@@ -23,25 +23,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.response;
+package org.sil.util;
 
-public enum ResponseHeaderName {
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+
+public class TestApacheFileTypeDetector {
+
+    final Path mimeTypes = Paths.get(System.getProperty("user.dir"), "src/main/resources", "mime.types");
+    ApacheFileTypeDetector detector;
     
-    ContentLength("Content-Length"),
-    Connection("Connection"),
-    Date("Date"),
-    LastModified("Last-Modified"),
-    Server("Server");
-    
-    private final String header;
-    
-    ResponseHeaderName(String header) {
-        this.header = header;
+    @BeforeTest
+    public void beforeTest() throws IOException {
+        detector = new ApacheFileTypeDetector();
+        detector.loadMimeTypes(mimeTypes);
     }
-    
-    @Override
-    public String toString() {
-        return header;
+
+    @Test
+    public void test_probeMimeType() {
+        assertEquals(detector.probeMimeType("html"), "text/html");
+
     }
-    
+
 }

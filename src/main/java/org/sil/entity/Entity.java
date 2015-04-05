@@ -30,7 +30,7 @@ import java.time.Instant;
 
 public interface Entity {
     
-    public Path getPath();
+    public Path getPhysicalPath();
     
     public Instant getLastModified();
     

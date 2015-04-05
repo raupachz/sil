@@ -23,25 +23,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.response;
+package org.sil.entity;
 
-public enum ResponseHeaderName {
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
+
+public class TestEntityFactory {
     
-    ContentLength("Content-Length"),
-    Connection("Connection"),
-    Date("Date"),
-    LastModified("Last-Modified"),
-    Server("Server");
+    final Path root = Paths.get(System.getProperty("user.dir"), "src/test/resources");
+    final EntityFactory ef = new EntityFactory(root);
     
-    private final String header;
     
-    ResponseHeaderName(String header) {
-        this.header = header;
+    @Test
+    public void test_get_indexhtml() throws IOException {
+        // We need to get rid of the /html
+        String uri = "/index.html";
+        Optional<Entity> opt = ef.get(uri);
+        assertTrue(opt.isPresent());
+        
+        Entity e = opt.get();
+        System.out.println(e.getPhysicalPath());
+        System.out.println(e.getContentType());
+        System.out.println(e.getLastModified());
+        System.out.println(e.getSize());
+        
+        
     }
     
-    @Override
-    public String toString() {
-        return header;
-    }
     
 }

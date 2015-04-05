@@ -100,8 +100,6 @@ public class TestHex {
         hex.dump(buffer, out);
         
         String actual = new String(out.toByteArray(), utf8);
-        
-        System.out.println(actual);
     }
     
     

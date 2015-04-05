@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.sil.entity.Entity;
 import static org.sil.response.ResponseHeaderName.*;
 
 public class Response {
@@ -39,7 +40,8 @@ public class Response {
     private final List<ResponseHeader> responseHeaders;
     
     private Status status;
-    
+    private Entity entity;
+
     public Response() {
         this.responseHeaders = new ArrayList<>();
     }
@@ -50,6 +52,14 @@ public class Response {
     
     public void setStatus(Status status) {
         this.status = status;
+    }
+    
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(Entity entity) {
+        this.entity = entity;
     }
     
     public void addHeader(ResponseHeader header) {
