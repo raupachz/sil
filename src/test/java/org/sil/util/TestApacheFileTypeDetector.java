@@ -26,8 +26,14 @@
 package org.sil.util;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -44,9 +50,21 @@ public class TestApacheFileTypeDetector {
     }
 
     @Test
-    public void test_probeMimeType() {
-        assertEquals(detector.probeMimeType("html"), "text/html");
-
+    public void test_probeMimeType() throws IOException {
+        Charset utf8 = StandardCharsets.UTF_8;
+        List<String> lines = Files.lines(mimeTypes, utf8)
+                                .filter(l -> !l.startsWith("#"))
+                                .collect(Collectors.toList());
+        Collections.shuffle(lines);
+        for (String line : lines) {
+            String[] tokens = line.split("\\s+");
+            String extension = tokens[1];
+            
+            String expected = tokens[0];
+            String actual = detector.probeMimeType(extension);
+            
+            assertEquals(actual, expected);
+        }
     }
 
 }

@@ -32,38 +32,49 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileTypeDetector;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ApacheFileTypeDetector extends FileTypeDetector {
 
-    private String[] mimeTypes;
-    private String[] extensions;
+    private String[][] mimeTypes;
+    private final Comparator<String[]> cmp = 
+            (final String[] str1, final String[] str2) -> str1[1].compareTo(str2[1]);
 
     void loadMimeTypes(Path path) throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
         List<String> lines = Files.lines(path, utf8)
                                 .filter(l -> !l.startsWith("#"))
                                 .collect(Collectors.toList());
-        extensions = new String[lines.size()];
-        mimeTypes = new String[lines.size()];
+        mimeTypes = new String[lines.size()][];
         for (int i = 0; i < lines.size(); i++) {
-            String[] tokens = lines.get(i).split("\\s+");
-            mimeTypes[i] = tokens[0];
-            extensions[i] = tokens[1];
+            mimeTypes[i] = lines.get(i).split("\\s+");
         }
+        // sort by extension
+        Arrays.sort(mimeTypes, cmp);
     }
     
-    String probeMimeType(String extension) {
-        int idx = Arrays.binarySearch(extensions, extension);
-        return idx < 0 ? null : mimeTypes[idx];
+    String probeMimeType(final String extension) {
+        final String[] key = new String[] { null, extension };
+        int i = Arrays.binarySearch(mimeTypes, key, cmp);
+        return i < 0 ? null : mimeTypes[i][0];
+    }
+    
+    String getExtension(Path path) {
+        String extension = "";
+        String filename = path.getFileName().toString().toLowerCase();
+        int i = filename.lastIndexOf('.');
+        if (i > 0) {
+            extension = filename.substring(i+1);
+        }
+        return extension;
     }
 
     @Override
     public String probeContentType(Path path) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String extension = getExtension(path);
+        return probeMimeType(extension);
     }
 
 }

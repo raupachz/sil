@@ -1464,7 +1464,7 @@ text/vnd.curl.dcurl				dcurl
 text/vnd.curl.scurl				scurl
 text/vnd.curl.mcurl				mcurl
 # text/vnd.dmclientscript
-text/vnd.dvb.subtitle				sub
+# text/vnd.dvb.subtitle				sub
 # text/vnd.esmertec.theme-descriptor
 text/vnd.fly					fly
 text/vnd.fmi.flexstor				flx
