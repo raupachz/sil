@@ -50,6 +50,27 @@ public class TestApacheFileTypeDetector {
         detector.loadMimeTypes(mimeTypes);
     }
     
+    @Test(expectedExceptions = NullPointerException.class)
+    public void test_null() {
+        detector.probeMimeType(null);
+    }
+    
+    @Test
+    public void test_empty() {
+        String extension = "";
+        String expected = "application/octet-stream";
+        String actual = detector.probeMimeType(extension);
+        assertEquals(actual, expected);
+    }
+    
+    @Test
+    public void test_unkown() {
+        String extension = "thehip";
+        String expected = "application/octet-stream";
+        String actual = detector.probeMimeType(extension);
+        assertEquals(actual, expected);
+    }
+    
     @Test
     public void test_onepkg() {
         String extension = "onepkg";

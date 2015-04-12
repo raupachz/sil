@@ -28,6 +28,7 @@ package org.sil.request;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import org.sil.request.Request.Method;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -57,57 +58,63 @@ public class TestRequestDecoder {
     public void test_decode_partial_garbage() {
         String request = "GET 938544562809809830945";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
-        assertNull(req);
+        Optional<Request> req = decoder.decode(bb);
+        assertFalse(req.isPresent());
     }
     
     @Test
     public void test_decode_total_garbage() {
         String request = "234938544562809809830945";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
-        assertNull(req);
+        Optional<Request> req = decoder.decode(bb);
+        assertFalse(req.isPresent());
     }
     
     // @Test
     public void test_decode_missing_path() {
         String request = "GET HTTP.1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
-        assertNull(req);
+        Optional<Request> req = decoder.decode(bb);
+        assertFalse(req.isPresent());
     }
     
     @Test
     public void test_decode_slash() {
         String request = "GET / HTTP.1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
+        Optional<Request> opt = decoder.decode(bb);
+        assertTrue(opt.isPresent());
         
-        assertNotNull(req);
+        Request req = opt.get();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.gerRawURI(), "/");
+        assertEquals(req.getRawURI(), "/");
+        assertEquals(req.getHttpVersion(), "HTTP.1.1");
     }
     
     @Test
     public void test_decode_indexhtml() {
         String request = "GET /index.html HTTP.1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
+        Optional<Request> opt = decoder.decode(bb);
+        assertTrue(opt.isPresent());
         
-        assertNotNull(req);
+        Request req = opt.get();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.gerRawURI(), "/index.html");
+        assertEquals(req.getRawURI(), "/index.html");
+        assertEquals(req.getHttpVersion(), "HTTP.1.1");
     }
     
     @Test
-    public void test_decode_direcories() {
+    public void test_decode_directories() {
         String request = "GET /a/b/c HTTP.1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Request req = decoder.decode(bb);
+        Optional<Request> opt = decoder.decode(bb);
+        assertTrue(opt.isPresent());
         
-        assertNotNull(req);
+        Request req = opt.get();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.gerRawURI(), "/a/b/c");
+        assertEquals(req.getRawURI(), "/a/b/c");
+        assertEquals(req.getHttpVersion(), "HTTP.1.1");
     }
     
      

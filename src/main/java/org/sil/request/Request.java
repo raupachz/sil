@@ -29,23 +29,29 @@ public final class Request {
     
     private final Method method;
     private final String rawURI;
+    private final String httpVersion;
     
-    public Request(Method method, String rawURI) {
+    public Request(Method method, String rawURI, String httpVersion) {
         this.method = method;
         this.rawURI = rawURI;
+        this.httpVersion = httpVersion;
     }
 
     public Method getMethod() {
         return method;
     }
 
-    public String gerRawURI() {
+    public String getRawURI() {
         return rawURI;
+    }
+    
+    public String getHttpVersion() {
+        return httpVersion;
     }
 
     public static enum Method {
         GET,
-        HEAD
+        HEAD,
     }
     
 }

@@ -49,7 +49,7 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
         List<String> lines = Files.lines(path, utf8)
                                 .filter(l -> !l.startsWith("#"))
                                 .collect(Collectors.toList());
-        // A single line can have more than one extension
+        // In mime.types a single line can have more than one extension
         List<String> tmp = new ArrayList<>();
         for (String line : lines) {
             String[] tokens = line.split("\\s+");
@@ -78,7 +78,7 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
     String probeMimeType(final String extension) {
         final String[] key = new String[] { null, extension };
         int i = Arrays.binarySearch(mimeTypes, key, cmp);
-        return i < 0 ? null : mimeTypes[i][0];
+        return i < 0 ? "application/octet-stream" : mimeTypes[i][0];
     }
     
     String getExtension(Path path) {

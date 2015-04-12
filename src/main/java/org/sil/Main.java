@@ -29,7 +29,7 @@ import org.sil.util.Getopt;
 import java.io.PrintStream;
 import static java.lang.System.*;
 
-public class Sil {
+public class Main {
 
     private static final PrintStream out = System.out;
 

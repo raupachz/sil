@@ -42,8 +42,8 @@ public class Hex {
     public void dump(ByteBuffer buffer, OutputStream out) throws IOException {
         Objects.requireNonNull(buffer, "buffer");
         Objects.requireNonNull(out, "out");
-
-        int pos = buffer.position();
+        
+        int pos = 0;
         int limit = buffer.limit();
         
         for (int l = 0; l < limit / BYTES_PER_LINE; l++, pos += BYTES_PER_LINE) {

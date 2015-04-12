@@ -55,6 +55,10 @@ public class HttpHandler implements Runnable {
     public HttpThread getThread() {
         return (HttpThread) Thread.currentThread();
     }
+    
+    public Instant getConnectedAt() {
+        return connectedAt;
+    }
 
     @Override
     public void run() {
@@ -62,7 +66,7 @@ public class HttpHandler implements Runnable {
         requestBuffer.clear();
         try {
             sc.read(requestBuffer);
-            Request request = decoder.decode(requestBuffer);
+            Request request = decoder.decode(requestBuffer).orElse(null);
             Response response = processor.process(request);
             ByteBuffer responseBuffer = encoder.encode(response);
             sc.write(responseBuffer);
