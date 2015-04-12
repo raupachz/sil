@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.spi.FileTypeDetector;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -41,15 +42,34 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
     private String[][] mimeTypes;
     private final Comparator<String[]> cmp = 
             (final String[] str1, final String[] str2) -> str1[1].compareTo(str2[1]);
-
+    
+    
     void loadMimeTypes(Path path) throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
         List<String> lines = Files.lines(path, utf8)
                                 .filter(l -> !l.startsWith("#"))
                                 .collect(Collectors.toList());
+        // A single line can have more than one extension
+        List<String> tmp = new ArrayList<>();
+        for (String line : lines) {
+            String[] tokens = line.split("\\s+");
+            if (tokens.length > 2) {
+                String mime = tokens[0];
+                for (int i = 1; i < tokens.length; i++) {
+                    String extension = tokens[i];
+                    String extraLine = mime + " " + extension;
+                    tmp.add(extraLine);
+                }
+            } else {
+                tmp.add(line);
+            }
+        }
+        lines = tmp;
+        // No gather all lines in a two-dimensional array
         mimeTypes = new String[lines.size()][];
         for (int i = 0; i < lines.size(); i++) {
             mimeTypes[i] = lines.get(i).split("\\s+");
+            assert mimeTypes[i].length == 2;
         }
         // sort by extension
         Arrays.sort(mimeTypes, cmp);

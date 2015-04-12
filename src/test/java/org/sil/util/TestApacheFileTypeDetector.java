@@ -25,6 +25,7 @@
  */
 package org.sil.util;
 
+import org.sil.util.ApacheFileTypeDetector;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +49,14 @@ public class TestApacheFileTypeDetector {
         detector = new ApacheFileTypeDetector();
         detector.loadMimeTypes(mimeTypes);
     }
+    
+    @Test
+    public void test_onepkg() {
+        String extension = "onepkg";
+        String expected = "application/onenote";
+        String actual = detector.probeMimeType(extension);
+        assertEquals(actual, expected);
+    }
 
     @Test
     public void test_probeMimeType() throws IOException {
@@ -58,12 +67,13 @@ public class TestApacheFileTypeDetector {
         Collections.shuffle(lines);
         for (String line : lines) {
             String[] tokens = line.split("\\s+");
-            String extension = tokens[1];
-            
             String expected = tokens[0];
-            String actual = detector.probeMimeType(extension);
             
-            assertEquals(actual, expected);
+            for (int i = 1; i < tokens.length; i++) {
+                String extension = tokens[i];
+                String actual = detector.probeMimeType(extension);
+                assertEquals(actual, expected, "with extension " + extension);
+            }
         }
     }
 

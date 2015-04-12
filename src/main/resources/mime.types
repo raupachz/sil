@@ -1,3 +1,5 @@
+# http://svn.apache.org/viewvc/httpd/httpd/branches/2.2.x/docs/conf/mime.types
+#
 # This file maps Internet media types to unique file extension(s).
 # Although created for httpd, this file is used by many software systems
 # and has been placed in the public domain for unlimited redisribution.
@@ -1075,7 +1077,7 @@ application/x-mobipocket-ebook			prc mobi
 application/x-ms-application			application
 application/x-ms-shortcut			lnk
 application/x-ms-wmd				wmd
-application/x-ms-wmz				wmz
+# application/x-ms-wmz				wmz
 application/x-ms-xbap				xbap
 application/x-msaccess				mdb
 application/x-msbinder				obd

@@ -78,4 +78,9 @@ public class RequestDecoder {
         return req;
     }
     
+    int indexOf(byte b, byte[] src, int offset, int limit) {
+        while (src[offset] != b && ++offset < limit) ;
+        return offset == limit ? -1 : offset;
+    }
+    
 }
