@@ -25,13 +25,15 @@
  */
 package org.sil.request;
 
+import org.sil.HttpVersion;
+
 public final class Request {
     
     private final Method method;
     private final String rawURI;
-    private final String httpVersion;
+    private final HttpVersion httpVersion;
     
-    public Request(Method method, String rawURI, String httpVersion) {
+    public Request(Method method, String rawURI, HttpVersion httpVersion) {
         this.method = method;
         this.rawURI = rawURI;
         this.httpVersion = httpVersion;
@@ -45,13 +47,13 @@ public final class Request {
         return rawURI;
     }
     
-    public String getHttpVersion() {
+    public HttpVersion getHttpVersion() {
         return httpVersion;
     }
 
     public static enum Method {
         GET,
-        HEAD,
+        HEAD
     }
     
 }

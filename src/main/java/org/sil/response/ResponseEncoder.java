@@ -51,7 +51,7 @@ public class ResponseEncoder {
     }
     
     void statusLine(Response response, ByteBuffer bb) {
-        bb.put(HttpVersion.Http11.toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(HttpVersion.HTTP11.toString().getBytes(StandardCharsets.UTF_8));
         bb.put(sp);
         bb.put(response.getStatus().toString().getBytes(StandardCharsets.UTF_8));
         bb.put(cr);

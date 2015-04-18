@@ -26,18 +26,19 @@
 package org.sil;
 
 public enum HttpVersion {
-    
-    Http11("HTTP/1.1");
-    
+
+    HTTP10("HTTP/1.0"),
+    HTTP11("HTTP/1.1");
+
     private final String version;
-    
+
     HttpVersion(String version) {
         this.version = version;
     }
-    
+
     @Override
     public String toString() {
         return version;
     }
-    
+
 }
