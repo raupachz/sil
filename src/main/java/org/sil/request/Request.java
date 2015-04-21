@@ -27,7 +27,8 @@ package org.sil.request;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 
@@ -49,7 +50,7 @@ public final class Request {
         this.httpVersion = httpVersion;
         this.headers = empty;
     }
-
+    
     public Method getMethod() {
         return method;
     }
@@ -62,8 +63,26 @@ public final class Request {
         return httpVersion;
     }
     
-    public Enumeration<String> getHeaderNames() {
-        return null;
+    public Iterator<String> getHeaderNames() {
+        return new Iterator<String>() {
+
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < headers.length;
+            }
+
+            @Override
+            public String next() {
+                if (hasNext()) {
+                    return headers[i++][0];
+                } else {
+                    throw new NoSuchElementException("next");
+                }
+            }
+            
+        };
     }
     
     public Optional<String> getHeaderValue(String header) {

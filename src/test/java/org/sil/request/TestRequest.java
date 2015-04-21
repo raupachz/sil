@@ -25,12 +25,35 @@
  */
 package org.sil.request;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
 public class TestRequest {
+    
+    @Test
+    public void test_getHeaderNames() {
+        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Iterator<String> iter = req.getHeaderNames();
+        assertNotNull(iter);
+        assertFalse(iter.hasNext());
+        // Idempotence 
+        assertFalse(iter.hasNext());
+        assertFalse(iter.hasNext());
+        assertFalse(iter.hasNext());
+    }
+    
+    @Test(expectedExceptions = NoSuchElementException.class)
+    void test_getHeaderNames_exception() {
+        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Iterator<String> iter = req.getHeaderNames();
+        assertNotNull(iter);
+        assertFalse(iter.hasNext());
+        iter.next();
+    }
     
     @Test
     public void test_getHeaderValue_null() {
