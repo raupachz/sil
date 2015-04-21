@@ -50,6 +50,12 @@ public class TestApacheFileTypeDetector {
         detector.loadMimeTypes(mimeTypes);
     }
     
+    @Test
+    public void test_multidimensional_arrys() {
+        String[][] m = new String[1][];
+        assertNull(m[0]);
+    }
+    
     @Test(expectedExceptions = NullPointerException.class)
     public void test_null() {
         detector.probeMimeType(null);

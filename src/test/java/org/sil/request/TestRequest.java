@@ -25,56 +25,33 @@
  */
 package org.sil.request;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.Optional;
 import org.sil.HttpVersion;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
-public final class Request {
+public class TestRequest {
     
-    private static final Comparator<String[]> cmp = 
-            (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
-    
-    private static final String[][] empty = new String[0][];
-    
-    private final Method method;
-    private final String rawURI;
-    private final HttpVersion httpVersion;
-    private final String[][] headers;
-    
-    Request(Method method, String rawURI, HttpVersion httpVersion) {
-        this.method = method;
-        this.rawURI = rawURI;
-        this.httpVersion = httpVersion;
-        this.headers = empty;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public String getRawURI() {
-        return rawURI;
+    @Test
+    public void test_getHeaderValue_null() {
+        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Optional<String> opt = req.getHeaderValue(null);
+        assertFalse(opt.isPresent());
     }
     
-    public HttpVersion getHttpVersion() {
-        return httpVersion;
+    @Test
+    public void test_getHeaderValue_blank() {
+        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Optional<String> opt = req.getHeaderValue("");
+        assertFalse(opt.isPresent());
     }
     
-    public Enumeration<String> getHeaderNames() {
-        return null;
+    @Test
+    public void test_getHeaderValue_missing() {
+        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Optional<String> opt = req.getHeaderValue("Host");
+        assertFalse(opt.isPresent());
     }
     
-    public Optional<String> getHeaderValue(String header) {
-        final String[] key = new String[] { header, null};
-        int i = Arrays.binarySearch(headers, key, cmp);
-        return i < 0 ? Optional.empty() : Optional.of(headers[i][1]);
-    }
-    
-    public static enum Method {
-        GET,
-        HEAD
-    }
     
 }

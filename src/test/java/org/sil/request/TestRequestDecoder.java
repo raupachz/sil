@@ -73,7 +73,7 @@ public class TestRequestDecoder {
     
     @Test
     public void test_decode_http10() {
-        String request = "GET / HTTP/1.0\r\n";
+        String request = "GET / HTTP/1.0\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
         Optional<Request> opt = decoder.decode(bb);
         assertTrue(opt.isPresent());

@@ -41,7 +41,7 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
 
     private String[][] mimeTypes;
     private final Comparator<String[]> cmp = 
-            (final String[] str1, final String[] str2) -> str1[1].compareTo(str2[1]);
+            (final String[] sa1, final String[] sa2) -> sa1[1].compareTo(sa2[1]);
     
     
     void loadMimeTypes(Path path) throws IOException {

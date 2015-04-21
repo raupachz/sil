@@ -25,28 +25,27 @@
  */
 package org.sil.request;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.sil.HttpVersion;
 import org.sil.request.Request.Method;
-import org.sil.util.Hex;
 
 public class RequestDecoder {
 
     private static final byte d0 = 48;
     private static final byte d1 = 49;
-    
+
     private static final byte E = 69;
     private static final byte G = 71;
     private static final byte H = 72;
     private static final byte P = 80;
     private static final byte T = 84;
-    
+
     private static final byte cr = 13; // \r
     private static final byte lf = 10; // \n
     private static final byte sp = 32; // SPACE
@@ -56,36 +55,37 @@ public class RequestDecoder {
 
     public Optional<Request> decode(ByteBuffer bb) {
         Objects.requireNonNull(bb);
-        
+
         // Things we need to decode
         Request.Method method;
         String rawURI;
-        HttpVersion httpVersion = null;
-        
+        HttpVersion httpVersion;
+        ArrayDeque<String> headers = new ArrayDeque<>();
+
         // Local variables
         final int limit = bb.limit();
         int i, p;
-        
+
         // A minimal request has at least 16 bytes (GET / HTTP/1.1)
         if (limit < 16) {
             return Optional.empty();
         }
-        
+
         // Works because we use non-direct buffer. Not happy about this one.
         byte[] ba = bb.array();
-        
+
         // --------------------------------------------------------------------
         // Parse Method
         // --------------------------------------------------------------------
-        if (ba[0] == G && 
-            ba[1] == E && 
-            ba[2] == T && 
-            ba[3] == sp) {
+        if (ba[0] == G
+                && ba[1] == E
+                && ba[2] == T
+                && ba[3] == sp) {
             method = Method.GET;
         } else {
             return Optional.empty();
         }
-        
+
         // --------------------------------------------------------------------
         // Parse URI
         // --------------------------------------------------------------------
@@ -100,14 +100,14 @@ public class RequestDecoder {
         // --------------------------------------------------------------------
         // Parse HTTP-Version
         // --------------------------------------------------------------------
-        if (ba[p++] == H  && 
-            ba[p++] == T  && 
-            ba[p++] == T  && 
-            ba[p++] == P  &&
-            ba[p++] == sl &&
-            ba[p++] == d1 && 
-            ba[p++] == dt) {
-            
+        if (ba[p++] == H
+                && ba[p++] == T
+                && ba[p++] == T
+                && ba[p++] == P
+                && ba[p++] == sl
+                && ba[p++] == d1
+                && ba[p++] == dt) {
+
             if (ba[p] == d1 && ba[++p] == cr && ba[++p] == lf) {
                 httpVersion = HttpVersion.HTTP11;
             } else if (ba[p] == d0 && ba[++p] == cr && ba[++p] == lf) {
@@ -118,27 +118,29 @@ public class RequestDecoder {
         } else {
             return Optional.empty();
         }
+
+        // At this point we parsed the request line
+        Request request = new Request(method, rawURI, httpVersion);
+
         // --------------------------------------------------------------------
         // Parse Headers
         // --------------------------------------------------------------------
-        Request request = new Request(method, rawURI, httpVersion);
+        p++;
+        while (ba[p] != cr && ba[p + 1] != lf) {
+            i = indexOf(cr, ba, p, limit);
+            String header = new String(ba, p, i - p, StandardCharsets.UTF_8);
+            System.out.println(header);
+            headers.add(header);
+            p = i + 2;
+        }
         return Optional.of(request);
     }
 
     int indexOf(byte b, byte[] src, int offset, int limit) {
-        while (src[offset] != b && ++offset < limit)
-            ;
-        return offset == limit ? -1 : offset;
-    }
-    
-    int indexOf(byte[] bytes, byte[] src, int offset, int limit) {
-        while (src[offset] != bytes[0] && ++offset < limit)
-            ;
-        if (++offset < limit) {
-            return src[offset] == bytes[1] ? offset : -1;
-        } else {
-            return -1;
+        while (src[offset] != b && ++offset < limit) {
+            ; // NOOP
         }
+        return offset == limit ? -1 : offset;
     }
 
 }
