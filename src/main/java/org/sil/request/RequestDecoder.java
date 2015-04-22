@@ -28,8 +28,6 @@ package org.sil.request;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.sil.HttpVersion;
@@ -57,14 +55,16 @@ public class RequestDecoder {
         Objects.requireNonNull(bb);
 
         // Things we need to decode
+        Request request;
         Request.Method method;
         String rawURI;
         HttpVersion httpVersion;
-        ArrayDeque<String> headers = new ArrayDeque<>();
 
-        // Local variables
+        // Local variables and helpers
+        final ArrayDeque<String> st = new ArrayDeque<>();
+        String name, value;
         final int limit = bb.limit();
-        int i, p;
+        int i, j, p;
 
         // A minimal request has at least 16 bytes (GET / HTTP/1.1)
         if (limit < 16) {
@@ -97,6 +97,7 @@ public class RequestDecoder {
             rawURI = new String(ba, p, i - p, StandardCharsets.UTF_8);
         }
         p = i + 1;
+        
         // --------------------------------------------------------------------
         // Parse HTTP-Version
         // --------------------------------------------------------------------
@@ -119,27 +120,35 @@ public class RequestDecoder {
             return Optional.empty();
         }
 
-        // At this point we parsed the request line
-        Request request = new Request(method, rawURI, httpVersion);
-
         // --------------------------------------------------------------------
         // Parse Headers
         // --------------------------------------------------------------------
         p++;
         while (ba[p] != cr && ba[p + 1] != lf) {
             i = indexOf(cr, ba, p, limit);
-            String header = new String(ba, p, i - p, StandardCharsets.UTF_8);
-            System.out.println(header);
-            headers.add(header);
+            j = indexOf(cl, ba, p, i);
+            
+            name = new String(ba, p, j - p, StandardCharsets.UTF_8);
+            value = new String(ba, j + 2, i - j, StandardCharsets.UTF_8);
+            
+            st.add(name);
+            st.add(value);
+            
             p = i + 2;
         }
+        
+        i = 0;
+        String[][] headers = new String[st.size() >> 1][];
+        while (!st.isEmpty()) {
+           headers[i++] = new String[] { st.pop(), st.pop() }; 
+        }
+        
+        request = new Request(method, rawURI, httpVersion, headers);
         return Optional.of(request);
     }
 
     int indexOf(byte b, byte[] src, int offset, int limit) {
-        while (src[offset] != b && ++offset < limit) {
-            ; // NOOP
-        }
+        while (src[offset] != b && ++offset < limit);
         return offset == limit ? -1 : offset;
     }
 

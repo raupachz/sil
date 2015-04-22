@@ -51,6 +51,13 @@ public final class Request {
         this.headers = empty;
     }
     
+    Request(Method method, String rawURI, HttpVersion httpVersion, String[][] headers) {
+        this.method = method;
+        this.rawURI = rawURI;
+        this.httpVersion = httpVersion;
+        this.headers = headers;
+    }
+    
     public Method getMethod() {
         return method;
     }
