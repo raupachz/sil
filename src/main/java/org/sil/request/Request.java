@@ -98,7 +98,7 @@ public final class Request {
         return i < 0 ? Optional.empty() : Optional.of(headers[i][1]);
     }
     
-    public static enum Method {
+    public enum Method {
         GET,
         HEAD
     }

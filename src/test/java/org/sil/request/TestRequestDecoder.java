@@ -28,7 +28,6 @@ package org.sil.request;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 import org.sil.HttpVersion;
 import org.sil.request.Request.Method;
 import org.testng.annotations.Test;
@@ -59,26 +58,26 @@ public class TestRequestDecoder {
     public void test_decode_partial_garbage() {
         String request = "GET 938544562809809830945";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> req = decoder.decode(bb);
-        assertFalse(req.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Flawed);
     }
     
     @Test
     public void test_decode_total_garbage() {
         String request = "234938544562809809830945";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> req = decoder.decode(bb);
-        assertFalse(req.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Flawed);
     }
     
     @Test
     public void test_decode_http10() {
         String request = "GET / HTTP/1.0\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> opt = decoder.decode(bb);
-        assertTrue(opt.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Successful);
         
-        Request req = opt.get();
+        Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
         assertEquals(req.getRawURI(), "/");
         assertEquals(req.getHttpVersion(), HttpVersion.HTTP10);
@@ -88,18 +87,18 @@ public class TestRequestDecoder {
     public void test_decode_missing_path() {
         String request = "GET HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> req = decoder.decode(bb);
-        assertFalse(req.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Flawed);
     }
     
     @Test
     public void test_decode_slash() {
         String request = "GET / HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> opt = decoder.decode(bb);
-        assertTrue(opt.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Successful);
         
-        Request req = opt.get();
+        Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
         assertEquals(req.getRawURI(), "/");
         assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);
@@ -109,10 +108,10 @@ public class TestRequestDecoder {
     public void test_decode_indexhtml() {
         String request = "GET /index.html HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> opt = decoder.decode(bb);
-        assertTrue(opt.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Successful);
         
-        Request req = opt.get();
+        Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
         assertEquals(req.getRawURI(), "/index.html");
         assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);
@@ -122,10 +121,10 @@ public class TestRequestDecoder {
     public void test_decode_directories() {
         String request = "GET /a/b/c HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
         ByteBuffer bb = utf8.encode(request);
-        Optional<Request> opt = decoder.decode(bb);
-        assertTrue(opt.isPresent());
+        Decoded dec = decoder.decode(bb);
+        assertEquals(dec.getResult(), Decoded.Result.Successful);
         
-        Request req = opt.get();
+        Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
         assertEquals(req.getRawURI(), "/a/b/c");
         assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);

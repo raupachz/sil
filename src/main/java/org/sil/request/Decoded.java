@@ -23,43 +23,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.entity;
+package org.sil.request;
 
-import java.nio.file.Path;
-import java.time.Instant;
-
-final class DefaultEntity implements Entity {
+public class Decoded {
     
-    private final Path physicalPath;
-    private final long size;
-    private final String contentType;
-    private final Instant lastModified;
-
-    DefaultEntity(Path physicalPath, Instant lastModified, long size, String contentType) {
-        this.physicalPath = physicalPath;
-        this.size = size;
-        this.lastModified = lastModified;
-        this.contentType = contentType;
+    public static Decoded Partial = new Decoded(Result.Partial);
+    public static Decoded Flawed = new Decoded(Result.Flawed);
+    
+    private final Result result;
+    private final Request request;
+    
+    Decoded(Result result) {
+        this.result = result;
+        this.request = null;
     }
     
-    @Override
-    public Path getPhysicalPath() {
-        return physicalPath;
+    Decoded(Request request) {
+        this.result = Result.Successful;
+        this.request = request;
     }
-
-    @Override
-    public Instant getLastModified() {
-        return lastModified;
+    
+    public Result getResult() {
+        return result;
     }
-
-    @Override
-    public long getSize() {
-        return size;
+    
+    public Request getRequest() {
+        return request;
     }
-
-    @Override
-    public String getContentType() {
-        return contentType;
+    
+    public enum Result {
+        Successful,
+        Partial,
+        Flawed
     }
+    
     
 }

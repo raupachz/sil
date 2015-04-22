@@ -35,6 +35,7 @@ import java.nio.channels.SocketChannel;
 import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sil.request.Decoded;
 
 public class HttpHandler implements Runnable {
     
@@ -66,10 +67,17 @@ public class HttpHandler implements Runnable {
         requestBuffer.clear();
         try {
             sc.read(requestBuffer);
-            Request request = decoder.decode(requestBuffer).orElse(null);
-            Response response = processor.process(request);
-            ByteBuffer responseBuffer = encoder.encode(response);
-            sc.write(responseBuffer);
+            Decoded dec = decoder.decode(requestBuffer);
+            
+            if (dec.getResult() == Decoded.Result.Successful) {
+                Request request = dec.getRequest();
+                Response response = processor.process(request);
+            }
+            
+            //Request request = decoder.decode(requestBuffer);
+            //Response response = processor.process(request);
+            //ByteBuffer responseBuffer = encoder.encode(response);
+            //sc.write(responseBuffer);
             sc.close();
         } catch (IOException ex) {
             Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);

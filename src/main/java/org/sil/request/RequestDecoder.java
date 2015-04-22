@@ -51,7 +51,7 @@ public class RequestDecoder {
     private static final byte sl = 47; // /
     private static final byte cl = 58; // :
 
-    public Optional<Request> decode(ByteBuffer bb) {
+    public Decoded decode(ByteBuffer bb) {
         Objects.requireNonNull(bb);
 
         // Things we need to decode
@@ -68,7 +68,7 @@ public class RequestDecoder {
 
         // A minimal request has at least 16 bytes (GET / HTTP/1.1)
         if (limit < 16) {
-            return Optional.empty();
+            return Decoded.Flawed;
         }
 
         // Works because we use non-direct buffer. Not happy about this one.
@@ -83,7 +83,7 @@ public class RequestDecoder {
                 && ba[3] == sp) {
             method = Method.GET;
         } else {
-            return Optional.empty();
+            return Decoded.Flawed;
         }
 
         // --------------------------------------------------------------------
@@ -92,7 +92,7 @@ public class RequestDecoder {
         p = method.name().length() + 1;
         i = indexOf(sp, ba, p, limit);
         if (i == -1) {
-            return Optional.empty();
+            return Decoded.Flawed;
         } else {
             rawURI = new String(ba, p, i - p, StandardCharsets.UTF_8);
         }
@@ -114,10 +114,10 @@ public class RequestDecoder {
             } else if (ba[p] == d0 && ba[++p] == cr && ba[++p] == lf) {
                 httpVersion = HttpVersion.HTTP10;
             } else {
-                return Optional.empty();
+                return Decoded.Flawed;
             }
         } else {
-            return Optional.empty();
+            return Decoded.Flawed;
         }
 
         // --------------------------------------------------------------------
@@ -144,7 +144,7 @@ public class RequestDecoder {
         }
         
         request = new Request(method, rawURI, httpVersion, headers);
-        return Optional.of(request);
+        return new Decoded(request);
     }
 
     int indexOf(byte b, byte[] src, int offset, int limit) {
