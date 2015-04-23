@@ -52,7 +52,7 @@ public class Httpd extends Thread {
     public void run() {
         ServerSocketChannel ssc;
         try {
-             ssc = ServerSocketChannel.open();
+            ssc = ServerSocketChannel.open();
             ssc.bind(new InetSocketAddress(8080));
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,9 +79,9 @@ public class Httpd extends Thread {
         }
 
     }
-    
+
     static class HttpThreadFactory implements ThreadFactory {
-        
+
         private static final AtomicInteger counter = new AtomicInteger();
 
         @Override
@@ -90,16 +90,16 @@ public class Httpd extends Thread {
             String name = "http-" + counter.getAndIncrement();
             return new HttpThread(group, target, name);
         }
-        
+
     }
-    
+
     static class DefaultRejectedExecutionHandler implements RejectedExecutionHandler {
 
         @Override
         public void rejectedExecution(Runnable target, ThreadPoolExecutor executor) {
             // this should yield some exception...
         }
-        
+
     }
 
 }

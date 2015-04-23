@@ -63,16 +63,28 @@ public class HttpHandler implements Runnable {
 
     @Override
     public void run() {
-        ByteBuffer requestBuffer = getThread().getBuffer();
-        requestBuffer.clear();
+        ByteBuffer bb = getThread().getBuffer();
+        bb.clear();
         try {
-            sc.read(requestBuffer);
-            Decoded dec = decoder.decode(requestBuffer);
+            // read everything into the buffer
+            while (bb.hasRemaining() && sc.read(bb) != -1) ;
+            bb.flip();
+            
+            Decoded dec = decoder.decode(bb);
+            switch (dec.getResult()) {
+                case Flawed : sc.close();
+                case Partial: sc.close(); // TODO
+                case Successful: 
+            }
             
             if (dec.getResult() == Decoded.Result.Successful) {
                 Request request = dec.getRequest();
                 Response response = processor.process(request);
             }
+            
+            // write the whole buffer
+            bb.flip();
+            while (bb.hasRemaining() && sc.write(bb) != -1) ;
             
             //Request request = decoder.decode(requestBuffer);
             //Response response = processor.process(request);
