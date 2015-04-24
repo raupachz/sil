@@ -39,12 +39,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Httpd extends Thread {
+public class HttpServerThread extends Thread {
 
     private final ExecutorService es;
 
-    public Httpd() {
-        super("httpd");
+    public HttpServerThread() {
+        super("http-server-0");
         this.es = new HttpThreadPoolExecutor(10, 200, 60000, TimeUnit.MILLISECONDS);
     }
 

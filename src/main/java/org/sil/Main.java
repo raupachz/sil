@@ -50,7 +50,7 @@ public class Main {
             }
         }
 
-        final Httpd httpd = new Httpd();
+        final HttpServerThread httpd = new HttpServerThread();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
