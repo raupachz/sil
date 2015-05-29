@@ -79,8 +79,8 @@ public class TestRequestDecoder {
         
         Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getRawURI(), "/");
-        assertEquals(req.getHttpVersion(), HttpVersion.HTTP10);
+        assertEquals(req.getURI(), "/");
+        assertEquals(req.getVersion(), HttpVersion.HTTP10);
     }
     
     @Test
@@ -100,8 +100,8 @@ public class TestRequestDecoder {
         
         Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getRawURI(), "/");
-        assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);
+        assertEquals(req.getURI(), "/");
+        assertEquals(req.getVersion(), HttpVersion.HTTP11);
     }
     
     @Test
@@ -113,8 +113,8 @@ public class TestRequestDecoder {
         
         Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getRawURI(), "/index.html");
-        assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);
+        assertEquals(req.getURI(), "/index.html");
+        assertEquals(req.getVersion(), HttpVersion.HTTP11);
     }
     
     @Test
@@ -126,8 +126,8 @@ public class TestRequestDecoder {
         
         Request req = dec.getRequest();
         assertEquals(req.getMethod(), Method.GET);
-        assertEquals(req.getRawURI(), "/a/b/c");
-        assertEquals(req.getHttpVersion(), HttpVersion.HTTP11);
+        assertEquals(req.getURI(), "/a/b/c");
+        assertEquals(req.getVersion(), HttpVersion.HTTP11);
     }
     
      

@@ -38,13 +38,16 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.sil.config.Configuration;
 
 public class HttpServerThread extends Thread {
 
+    private final Configuration config;
     private final ExecutorService es;
 
-    public HttpServerThread() {
+    public HttpServerThread(Configuration config) {
         super("http-server-0");
+        this.config = config;
         this.es = new HttpThreadPoolExecutor(10, 200, 60000, TimeUnit.MILLISECONDS);
     }
 
@@ -53,7 +56,7 @@ public class HttpServerThread extends Thread {
         ServerSocketChannel ssc;
         try {
             ssc = ServerSocketChannel.open();
-            ssc.bind(new InetSocketAddress(8080));
+            ssc.bind(new InetSocketAddress(config.getPort()));
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -63,7 +66,7 @@ public class HttpServerThread extends Thread {
             try {
                 SocketChannel sc = ssc.accept();
                 sc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-                HttpHandler hh = new HttpHandler(sc, Instant.now());
+                HttpHandler hh = new HttpHandler(config, sc);
                 es.execute(hh);
             } catch (IOException e) {
                 e.printStackTrace();

@@ -35,19 +35,23 @@ import java.nio.channels.SocketChannel;
 import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sil.config.Configuration;
 import org.sil.request.Decoded;
+import org.sil.util.Hex;
 
 public class HttpHandler implements Runnable {
     
+    private final Configuration config;
     private final SocketChannel sc;
     private final Instant connectedAt;
     private final RequestDecoder decoder;
     private final ResponseEncoder encoder;
     private final Processor processor;
     
-    public HttpHandler(SocketChannel sc, Instant connectedAt) {
+    public HttpHandler(Configuration config, SocketChannel sc) {
+        this.config = config;
         this.sc = sc;
-        this.connectedAt = connectedAt;
+        this.connectedAt = Instant.now();
         this.decoder = new RequestDecoder();
         this.encoder = new ResponseEncoder();
         this.processor = new Processor();
@@ -63,6 +67,13 @@ public class HttpHandler implements Runnable {
 
     @Override
     public void run() {
+        if (config.isDebug()) {
+            try {
+                System.out.println("* connection from " + sc.getRemoteAddress());
+            } catch (IOException ex) {
+                Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         ByteBuffer bb = getThread().getBuffer();
         bb.clear();
         try {
@@ -70,11 +81,15 @@ public class HttpHandler implements Runnable {
             while (bb.hasRemaining() && sc.read(bb) != -1) ;
             bb.flip();
             
+            if (config.isDebug()) {
+                new Hex().dump(bb, System.out);
+                bb.rewind();
+            }
+            
             Decoded dec = decoder.decode(bb);
             switch (dec.getResult()) {
-                case Flawed : sc.close();
-                case Partial: sc.close(); // TODO
-                case Successful: 
+                case Flawed : sc.close(); return;
+                case Partial: sc.close(); return;
             }
             
             if (dec.getResult() == Decoded.Result.Successful) {

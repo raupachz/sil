@@ -25,6 +25,7 @@
  */
 package org.sil.request;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -32,7 +33,16 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 
-public final class Request {
+/**
+ * The {@code Request} class represents a HTTP request message.
+ * A requests is immutable and thread-safe.
+ */
+public final class Request implements Serializable {
+    
+    public enum Method {
+        GET,
+        HEAD
+    }
     
     private static final Comparator<String[]> cmp = 
             (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
@@ -40,21 +50,18 @@ public final class Request {
     private static final String[][] empty = new String[0][];
     
     private final Method method;
-    private final String rawURI;
-    private final HttpVersion httpVersion;
+    private final String uri;
+    private final HttpVersion version;
     private final String[][] headers;
     
-    Request(Method method, String rawURI, HttpVersion httpVersion) {
-        this.method = method;
-        this.rawURI = rawURI;
-        this.httpVersion = httpVersion;
-        this.headers = empty;
+    Request(Method method, String uri, HttpVersion version) {
+        this(method, uri, version, empty);
     }
     
-    Request(Method method, String rawURI, HttpVersion httpVersion, String[][] headers) {
+    Request(Method method, String uri, HttpVersion version, String[][] headers) {
         this.method = method;
-        this.rawURI = rawURI;
-        this.httpVersion = httpVersion;
+        this.uri = uri;
+        this.version = version;
         this.headers = headers;
     }
     
@@ -62,12 +69,12 @@ public final class Request {
         return method;
     }
 
-    public String getRawURI() {
-        return rawURI;
+    public String getURI() {
+        return uri;
     }
     
-    public HttpVersion getHttpVersion() {
-        return httpVersion;
+    public HttpVersion getVersion() {
+        return version;
     }
     
     public Iterator<String> getHeaderNames() {
@@ -96,11 +103,6 @@ public final class Request {
         final String[] key = new String[] { header, null};
         int i = Arrays.binarySearch(headers, key, cmp);
         return i < 0 ? Optional.empty() : Optional.of(headers[i][1]);
-    }
-    
-    public enum Method {
-        GET,
-        HEAD
     }
     
 }

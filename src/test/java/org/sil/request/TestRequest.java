@@ -25,7 +25,6 @@
  */
 package org.sil.request;
 
-import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;

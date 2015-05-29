@@ -26,12 +26,12 @@
 package org.sil.entity;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
+import static java.nio.file.Files.*;
 
 public class EntityFactory {
     
@@ -41,22 +41,25 @@ public class EntityFactory {
         this.root = root;
     }
     
-    public Optional<Entity> get(String rawURI) throws IOException {
-        Objects.requireNonNull(rawURI);
+    public Optional<Entity> of(Path physicalPath) throws IOException {
+        Objects.requireNonNull(physicalPath);
         
-        Path physicalPath = physicalPathOf(rawURI);
-        
-        if (!Files.exists(physicalPath, LinkOption.NOFOLLOW_LINKS)
-                || Files.isDirectory(physicalPath, LinkOption.NOFOLLOW_LINKS)) {
+        if (!exists(physicalPath, LinkOption.NOFOLLOW_LINKS)
+                || isDirectory(physicalPath, LinkOption.NOFOLLOW_LINKS)) {
             return Optional.empty();
         }
         
-        long size = Files.size(physicalPath);
-        Instant lastModified = Files.getLastModifiedTime(physicalPath, LinkOption.NOFOLLOW_LINKS).toInstant();
-        String contentType = Files.probeContentType(physicalPath);
+        long size = size(physicalPath);
+        Instant lastModified = getLastModifiedTime(physicalPath, LinkOption.NOFOLLOW_LINKS).toInstant();
+        String contentType = probeContentType(physicalPath);
         
         Entity entity = new DefaultEntity(physicalPath, lastModified, size, contentType);
         return Optional.of(entity);
+    }
+    
+    public Optional<Entity> of(String rawURI) throws IOException {
+        Objects.requireNonNull(rawURI);
+        return of(physicalPathOf(rawURI));
     }
     
     Path physicalPathOf(String rawURI) {

@@ -28,6 +28,7 @@ package org.sil;
 import org.sil.util.Getopt;
 import java.io.PrintStream;
 import static java.lang.System.*;
+import org.sil.config.Configuration;
 
 public class Main {
 
@@ -49,8 +50,11 @@ public class Main {
                     System.exit(0);
             }
         }
+        
+        // Parse sil.properties
+        Configuration config = new Configuration();
 
-        final HttpServerThread httpd = new HttpServerThread();
+        final HttpServerThread httpd = new HttpServerThread(config);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
