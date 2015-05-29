@@ -25,7 +25,6 @@
  */
 package org.sil.request;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -35,9 +34,9 @@ import org.sil.HttpVersion;
 
 /**
  * The {@code Request} class represents a HTTP request message.
- * A requests is immutable and thread-safe.
+ * A Requests is immutable and thread-safe.
  */
-public final class Request implements Serializable {
+public final class Request {
     
     public enum Method {
         GET,

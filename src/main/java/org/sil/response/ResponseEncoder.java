@@ -26,11 +26,13 @@
 package org.sil.response;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.*;
 import java.time.format.DateTimeFormatter;
 import org.sil.HttpVersion;
 
 public class ResponseEncoder {
+    
+    
     
     private static final byte sp = 32; // SPACE
     private static final byte cr = 13; // \r
@@ -42,8 +44,6 @@ public class ResponseEncoder {
         ByteBuffer bb = ByteBuffer.allocate(4096);
         // write response to buffer
         statusLine(response, bb);
-        responseHeaders(response, bb);
-        entity(response, bb);
         empyLine(bb);
         // prepare buffer for writing
         bb.flip();
@@ -51,26 +51,11 @@ public class ResponseEncoder {
     }
     
     void statusLine(Response response, ByteBuffer bb) {
-        bb.put(HttpVersion.HTTP11.toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(HttpVersion.HTTP11.toString().getBytes(UTF_8));
         bb.put(sp);
-        bb.put(response.getStatus().toString().getBytes(StandardCharsets.UTF_8));
+        bb.put(response.getCode().getBytes(UTF_8));
         bb.put(cr);
         bb.put(lf);
-    }
-    
-    void responseHeaders(Response response, ByteBuffer bb) {
-        for (ResponseHeader rh : response.getResponseHeaders()) {
-            bb.put(rh.getName().toString().getBytes(StandardCharsets.UTF_8));
-            bb.put(cl);
-            bb.put(sp);
-            bb.put(rh.getValue().getBytes(StandardCharsets.UTF_8));
-            bb.put(cr);
-            bb.put(lf);
-        }
-    }
-    
-    private void entity(Response response, ByteBuffer bb) {
-        
     }
     
     void empyLine(ByteBuffer bb) {

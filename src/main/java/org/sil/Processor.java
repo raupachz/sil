@@ -26,7 +26,6 @@
 package org.sil;
 
 import org.sil.request.Request;
-import org.sil.response.Responses;
 import org.sil.response.Response;
 
 /**
@@ -35,7 +34,7 @@ import org.sil.response.Response;
 public class Processor {
     
     public Response process(Request request) {
-        return Responses.NotFound;
+        return null;
     }
     
 }

@@ -25,72 +25,109 @@
  */
 package org.sil.response;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Optional;
+import org.sil.HttpVersion;
 import org.sil.entity.Entity;
-import static org.sil.response.ResponseHeaderName.*;
 
+/**
+ * The {@code Request} class represents a HTTP response message.
+ * A Response is immutable and thread-safe.
+ */
 public class Response {
     
-    private final List<ResponseHeader> responseHeaders;
+    private final HttpVersion version;
+    private final String code;
+    private final String phrase;
+    private final String[][] headers;
+    private final Optional<Entity> entity;
     
-    private Status status;
-    private Entity entity;
-
-    public Response() {
-        this.responseHeaders = new ArrayList<>();
-    }
-    
-    public Status getStatus() {
-        return status;
-    }
-    
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-    
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public void setEntity(Entity entity) {
+    Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Entity> entity) {
+        this.version = version;
+        this.code = code;
+        this.phrase = phrase;
+        this.headers = headers;
         this.entity = entity;
     }
     
-    public void addHeader(ResponseHeader header) {
-        responseHeaders.add(header);
+    public HttpVersion getVersion() {
+        return version;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getPhrase() {
+        return phrase;
+    }
+
+    public String[][] getHeaders() {
+        return headers;
+    }
+
+    public Optional<Entity> getEntity() {
+        return entity;
     }
     
-    public void removeHeader(ResponseHeader header) {
-        responseHeaders.remove(header);
-    }
-    
-    public Collection<ResponseHeader> getResponseHeaders() {
-        return responseHeaders;
-    }
-    
-    public static Response blank() {
-        return new Response();
-    }
-    
-    public static Response of(Status status) {
-        Response res = new Response();
-        res.setStatus(status);
-        res.addHeader(new ResponseHeader(Server, "sil"));
-        res.addHeader(new ResponseHeader(Connection, "close"));
-        res.addHeader(new ResponseHeader(ContentLength, "0"));
+    public static class Builder {
+
+        private HttpVersion _version;
+        private Integer _code;
+        private String _phrase;
+        private final ArrayDeque<String[]> _stack;
+        private Entity _entity;
+
+        public Builder() {
+            this._stack = new ArrayDeque<>();
+        }
         
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("GMT"));
-        String dateValue = DateTimeFormatter.RFC_1123_DATE_TIME.format(now);
+        public Builder version(HttpVersion version) {
+            this._version = version;
+            return this;
+        }
         
-        res.addHeader(new ResponseHeader(Date, dateValue));
+        public Builder phrase(String phrase) {
+            this._phrase = phrase;
+            return this;
+        }
         
-        return res;
+        public Builder code(int code) {
+            this._code = code; 
+            return this;
+        }
+        
+        public Builder header(String name, String value) {
+            this._stack.add(new String[] {name, value});
+            return this;
+        }
+        
+        public Builder entity(Entity entity) {
+            this._entity = entity;
+            return this;
+        }
+        
+        public Response build() {
+            if (_version == null) {
+                throw new NullPointerException("version");
+            }
+            if (_code == null) {
+                throw new NullPointerException("code");
+            }
+            if (_phrase == null) {
+                throw new NullPointerException("phrase");
+            }
+
+            String[][] headers = new String[_stack.size()][];
+            for (int i = 0; i < _stack.size(); i++) {
+                headers[i] = _stack.pop();
+            }
+            
+            Optional<Entity> entity = (_entity == null) ? Optional.empty() : Optional.of(_entity);
+            
+            return new Response(_version, _code.toString(), _phrase, headers, entity);
+        }
+        
     }
     
 }
