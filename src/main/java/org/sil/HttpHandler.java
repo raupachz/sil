@@ -49,9 +49,9 @@ public class HttpHandler implements Runnable {
     private final Processor processor;
     
     public HttpHandler(Configuration config, SocketChannel sc) {
+        this.connectedAt = Instant.now();
         this.config = config;
         this.sc = sc;
-        this.connectedAt = Instant.now();
         this.decoder = new RequestDecoder();
         this.encoder = new ResponseEncoder();
         this.processor = new Processor();

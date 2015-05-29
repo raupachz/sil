@@ -28,37 +28,36 @@ package org.sil.response;
 import java.nio.ByteBuffer;
 import static java.nio.charset.StandardCharsets.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import org.sil.HttpVersion;
 
 public class ResponseEncoder {
-    
+
     private static final byte sp = 32; // SPACE
     private static final byte cr = 13; // \r
     private static final byte lf = 10; // \n
     private static final byte cl = 58; // :
-    
-    public ByteBuffer encode(Response response) {
-        // allocate heap buffer
-        ByteBuffer bb = ByteBuffer.allocate(4096);
-        // write response to buffer
-        statusLine(response, bb);
-        empyLine(bb);
-        // prepare buffer for writing
-        bb.flip();
-        return bb;
-    }
-    
-    void statusLine(Response response, ByteBuffer bb) {
-        bb.put(HttpVersion.HTTP11.toString().getBytes(UTF_8));
-        bb.put(sp);
-        bb.put(response.getCode().getBytes(UTF_8));
+
+    public void encode(Response response, ByteBuffer bb) {
+        // Status line
+        bb.put(HttpVersion.HTTP11.toString().getBytes(UTF_8))
+                .put(sp)
+                .put(response.getCode().getBytes(UTF_8))
+                .put(sp)
+                .put(response.getPhrase().getBytes(UTF_8))
+                .put(cr)
+                .put(lf);
+        for (String name : response.getHeaderNames()) {
+            String value = response.getHeaderValue(name);
+            bb.put(name.getBytes(UTF_8));
+            bb.put(cl);
+            bb.put(sp);
+            bb.put(value.getBytes(UTF_8));
+            bb.put(cr);
+            bb.put(lf);
+        }
         bb.put(cr);
         bb.put(lf);
     }
-    
-    void empyLine(ByteBuffer bb) {
-        bb.put(cr);
-        bb.put(lf);
-    }
-    
+
 }

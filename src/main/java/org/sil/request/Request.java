@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
+import org.sil.response.Response;
 
 /**
  * The {@code Request} class represents a HTTP request message.
@@ -76,32 +77,37 @@ public final class Request {
         return version;
     }
     
-    public Iterator<String> getHeaderNames() {
-        return new Iterator<String>() {
-
-            int i = 0;
-
-            @Override
-            public boolean hasNext() {
-                return i < headers.length;
-            }
-
-            @Override
-            public String next() {
-                if (hasNext()) {
-                    return headers[i++][0];
-                } else {
-                    throw new NoSuchElementException("next");
-                }
-            }
-            
-        };
+    public Iterable<String> getHeaderNames() {
+        return () -> new Request.IteratorImpl();
     }
     
     public Optional<String> getHeaderValue(String header) {
         final String[] key = new String[] { header, null};
         int i = Arrays.binarySearch(headers, key, cmp);
         return i < 0 ? Optional.empty() : Optional.of(headers[i][1]);
+    }
+    
+    private class IteratorImpl implements Iterator<String> {
+
+        private int i;
+
+        private IteratorImpl() {
+            this.i = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return i < headers.length;
+        }
+
+        @Override
+        public String next() {
+            if (hasNext()) {
+                return headers[i++][0];
+            } else {
+                throw new NoSuchElementException("next");
+            }
+        }
     }
     
 }

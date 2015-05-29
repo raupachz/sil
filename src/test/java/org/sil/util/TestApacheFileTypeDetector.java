@@ -26,7 +26,6 @@
 package org.sil.util;
 
 import java.io.FileInputStream;
-import org.sil.util.ApacheFileTypeDetector;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

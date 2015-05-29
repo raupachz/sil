@@ -51,39 +51,40 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
             throw new RuntimeException("mime.types", e);
         }
     }
-    
+
     public ApacheFileTypeDetector(InputStream in) throws IOException {
         loadMimeTypes(in);
     }
 
     private void loadMimeTypes(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
-        // In mime.types a single line can have more than one extension
-        List<String> lines = new ArrayList<>();
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (!line.startsWith("#")) {
-                String[] tokens = line.split("\\s+");
-                if (tokens.length > 2) {
-                    String mime = tokens[0];
-                    for (int i = 1; i < tokens.length; i++) {
-                        String extension = tokens[i];
-                        String extraLine = mime + " " + extension;
-                        lines.add(extraLine);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8))) {
+            // In mime.types a single line can have more than one extension
+            List<String> lines = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.startsWith("#")) {
+                    String[] tokens = line.split("\\s+");
+                    if (tokens.length > 2) {
+                        String mime = tokens[0];
+                        for (int i = 1; i < tokens.length; i++) {
+                            String extension = tokens[i];
+                            String extraLine = mime + " " + extension;
+                            lines.add(extraLine);
+                        }
+                    } else {
+                        lines.add(line);
                     }
-                } else {
-                    lines.add(line);
                 }
             }
+            // Now gather all lines in a two-dimensional array
+            mimeTypes = new String[lines.size()][];
+            for (int i = 0; i < lines.size(); i++) {
+                mimeTypes[i] = lines.get(i).split("\\s+");
+                assert mimeTypes[i].length == 2;
+            }
+            // sort by extension
+            Arrays.sort(mimeTypes, cmp);
         }
-        // Now gather all lines in a two-dimensional array
-        mimeTypes = new String[lines.size()][];
-        for (int i = 0; i < lines.size(); i++) {
-            mimeTypes[i] = lines.get(i).split("\\s+");
-            assert mimeTypes[i].length == 2;
-        }
-        // sort by extension
-        Arrays.sort(mimeTypes, cmp);
     }
 
     String probeMimeType(final String extension) {

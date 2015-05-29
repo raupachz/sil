@@ -26,22 +26,29 @@
 package org.sil.response;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 import org.sil.entity.Entity;
 
 /**
- * The {@code Request} class represents a HTTP response message.
- * A Response is immutable and thread-safe.
+ * The {@code Request} class represents a HTTP response message. A Response is
+ * immutable and thread-safe.
  */
 public class Response {
-    
+
+    private static final Comparator<String[]> cmp
+            = (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
+
     private final HttpVersion version;
     private final String code;
     private final String phrase;
     private final String[][] headers;
     private final Optional<Entity> entity;
-    
+
     Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Entity> entity) {
         this.version = version;
         this.code = code;
@@ -49,7 +56,7 @@ public class Response {
         this.headers = headers;
         this.entity = entity;
     }
-    
+
     public HttpVersion getVersion() {
         return version;
     }
@@ -62,14 +69,20 @@ public class Response {
         return phrase;
     }
 
-    public String[][] getHeaders() {
-        return headers;
+    public Iterable<String> getHeaderNames() {
+        return () -> new IteratorImpl();
+    }
+
+    public String getHeaderValue(String header) {
+        final String[] key = new String[]{header, null};
+        int i = Arrays.binarySearch(headers, key, cmp);
+        return headers[i][1];
     }
 
     public Optional<Entity> getEntity() {
         return entity;
     }
-    
+
     public static class Builder {
 
         private HttpVersion _version;
@@ -81,32 +94,32 @@ public class Response {
         public Builder() {
             this._stack = new ArrayDeque<>();
         }
-        
+
         public Builder version(HttpVersion version) {
             this._version = version;
             return this;
         }
-        
+
         public Builder phrase(String phrase) {
             this._phrase = phrase;
             return this;
         }
-        
+
         public Builder code(int code) {
-            this._code = code; 
+            this._code = code;
             return this;
         }
-        
+
         public Builder header(String name, String value) {
-            this._stack.add(new String[] {name, value});
+            this._stack.add(new String[]{name, value});
             return this;
         }
-        
+
         public Builder entity(Entity entity) {
             this._entity = entity;
             return this;
         }
-        
+
         public Response build() {
             if (_version == null) {
                 throw new NullPointerException("version");
@@ -122,12 +135,35 @@ public class Response {
             for (int i = 0; i < _stack.size(); i++) {
                 headers[i] = _stack.pop();
             }
-            
+
             Optional<Entity> entity = (_entity == null) ? Optional.empty() : Optional.of(_entity);
-            
+
             return new Response(_version, _code.toString(), _phrase, headers, entity);
         }
-        
+
     }
-    
+
+    private class IteratorImpl implements Iterator<String> {
+
+        private int i;
+
+        private IteratorImpl() {
+            this.i = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return i < headers.length;
+        }
+
+        @Override
+        public String next() {
+            if (hasNext()) {
+                return headers[i++][0];
+            } else {
+                throw new NoSuchElementException("next");
+            }
+        }
+    }
+
 }
