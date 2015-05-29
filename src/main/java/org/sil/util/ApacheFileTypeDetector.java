@@ -25,47 +25,58 @@
  */
 package org.sil.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import static java.nio.charset.StandardCharsets.*;
 import java.nio.file.Path;
 import java.nio.file.spi.FileTypeDetector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ApacheFileTypeDetector extends FileTypeDetector {
 
     private String[][] mimeTypes;
-    private final Comparator<String[]> cmp = 
-            (final String[] sa1, final String[] sa2) -> sa1[1].compareTo(sa2[1]);
+    private final Comparator<String[]> cmp
+            = (final String[] sa1, final String[] sa2) -> sa1[1].compareTo(sa2[1]);
+
+    public ApacheFileTypeDetector() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        try (InputStream in = classLoader.getResourceAsStream("mime.types")) {
+            loadMimeTypes(in);
+        } catch (IOException e) {
+            throw new RuntimeException("mime.types", e);
+        }
+    }
     
-    
-    void loadMimeTypes(Path path) throws IOException {
-        Charset utf8 = StandardCharsets.UTF_8;
-        List<String> lines = Files.lines(path, utf8)
-                                .filter(l -> !l.startsWith("#"))
-                                .collect(Collectors.toList());
+    public ApacheFileTypeDetector(InputStream in) throws IOException {
+        loadMimeTypes(in);
+    }
+
+    private void loadMimeTypes(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
         // In mime.types a single line can have more than one extension
-        List<String> tmp = new ArrayList<>();
-        for (String line : lines) {
-            String[] tokens = line.split("\\s+");
-            if (tokens.length > 2) {
-                String mime = tokens[0];
-                for (int i = 1; i < tokens.length; i++) {
-                    String extension = tokens[i];
-                    String extraLine = mime + " " + extension;
-                    tmp.add(extraLine);
+        List<String> lines = new ArrayList<>();
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (!line.startsWith("#")) {
+                String[] tokens = line.split("\\s+");
+                if (tokens.length > 2) {
+                    String mime = tokens[0];
+                    for (int i = 1; i < tokens.length; i++) {
+                        String extension = tokens[i];
+                        String extraLine = mime + " " + extension;
+                        lines.add(extraLine);
+                    }
+                } else {
+                    lines.add(line);
                 }
-            } else {
-                tmp.add(line);
             }
         }
-        lines = tmp;
-        // No gather all lines in a two-dimensional array
+        // Now gather all lines in a two-dimensional array
         mimeTypes = new String[lines.size()][];
         for (int i = 0; i < lines.size(); i++) {
             mimeTypes[i] = lines.get(i).split("\\s+");
@@ -74,19 +85,19 @@ public class ApacheFileTypeDetector extends FileTypeDetector {
         // sort by extension
         Arrays.sort(mimeTypes, cmp);
     }
-    
+
     String probeMimeType(final String extension) {
-        final String[] key = new String[] { null, extension };
+        final String[] key = new String[]{null, extension};
         int i = Arrays.binarySearch(mimeTypes, key, cmp);
         return i < 0 ? "application/octet-stream" : mimeTypes[i][0];
     }
-    
+
     String getExtension(Path path) {
         String extension = "";
         String filename = path.getFileName().toString().toLowerCase();
         int i = filename.lastIndexOf('.');
         if (i > 0) {
-            extension = filename.substring(i+1);
+            extension = filename.substring(i + 1);
         }
         return extension;
     }

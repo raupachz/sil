@@ -34,7 +34,11 @@ import org.sil.response.Response;
 public class Processor {
     
     public Response process(Request request) {
-        return null;
+        return new Response.Builder()
+                .version(HttpVersion.HTTP11)
+                .code(500)
+                .phrase("Internal Server Error")
+                .build();
     }
     
 }

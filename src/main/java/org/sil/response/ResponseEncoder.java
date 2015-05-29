@@ -32,8 +32,6 @@ import org.sil.HttpVersion;
 
 public class ResponseEncoder {
     
-    
-    
     private static final byte sp = 32; // SPACE
     private static final byte cr = 13; // \r
     private static final byte lf = 10; // \n

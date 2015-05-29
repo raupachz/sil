@@ -25,8 +25,10 @@
  */
 package org.sil.util;
 
+import java.io.FileInputStream;
 import org.sil.util.ApacheFileTypeDetector;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,8 +48,8 @@ public class TestApacheFileTypeDetector {
     
     @BeforeTest
     public void beforeTest() throws IOException {
-        detector = new ApacheFileTypeDetector();
-        detector.loadMimeTypes(mimeTypes);
+        InputStream in = new FileInputStream(mimeTypes.toFile());
+        detector = new ApacheFileTypeDetector(in);
     }
     
     @Test
