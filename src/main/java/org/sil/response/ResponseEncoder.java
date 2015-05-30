@@ -26,10 +26,8 @@
 package org.sil.response;
 
 import java.nio.ByteBuffer;
-import static java.nio.charset.StandardCharsets.*;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import org.sil.HttpVersion;
+import static java.nio.charset.StandardCharsets.*;
 
 public class ResponseEncoder {
 

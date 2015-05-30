@@ -36,8 +36,6 @@ import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.sil.config.Configuration;
-import org.sil.request.Decoded;
-import org.sil.util.Hex;
 
 public class HttpHandler implements Runnable {
     
@@ -45,13 +43,15 @@ public class HttpHandler implements Runnable {
     
     private final Configuration config;
     private final SocketChannel sc;
-    private final Instant connectedAt;
     private final RequestDecoder decoder;
     private final ResponseEncoder encoder;
     private final Processor processor;
+    private final Instant connectedAt;
+    private Instant lastReadWriteAt;
     
     public HttpHandler(Configuration config, SocketChannel sc) {
         this.connectedAt = Instant.now();
+        this.lastReadWriteAt = connectedAt;
         this.config = config;
         this.sc = sc;
         this.decoder = new RequestDecoder();
@@ -59,12 +59,16 @@ public class HttpHandler implements Runnable {
         this.processor = new Processor();
     }
     
-    public HttpThread getThread() {
+    HttpThread getThread() {
         return (HttpThread) Thread.currentThread();
     }
     
     public Instant getConnectedAt() {
         return connectedAt;
+    }
+    
+    public Instant getLastReadWriteAt() {
+        return lastReadWriteAt;
     }
 
     @Override
@@ -108,6 +112,8 @@ public class HttpHandler implements Runnable {
         Request request = readRequest();
         Response response = processor.process(request);
         writeResponse(response);
+        // TODO Remove Late
+        close();
     }
     
     Request readRequest() {
@@ -126,6 +132,17 @@ public class HttpHandler implements Runnable {
             sc.close();
         } catch (IOException e) {
             logger.log(Level.WARNING, e, () -> "Could not write response to channel.");
+        }
+    }
+    
+    /**
+     * Closes this handler and all its resources
+     */
+    public synchronized void close() {
+        try {
+            sc.close();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, e, () -> "Could not close handler.");
         }
     }
     

@@ -23,54 +23,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.entity;
+package org.sil.body;
 
-import java.io.IOException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-import static java.nio.file.Files.*;
 
-public class EntityFactory {
+public interface Body {
     
-    private final Path root;
+    public Path getPhysicalPath();
     
-    public EntityFactory(Path root) {
-        this.root = root;
-    }
+    public Instant getLastModified();
     
-    public Optional<Entity> of(Path physicalPath) throws IOException {
-        Objects.requireNonNull(physicalPath);
-        
-        if (!exists(physicalPath, LinkOption.NOFOLLOW_LINKS)
-                || isDirectory(physicalPath, LinkOption.NOFOLLOW_LINKS)) {
-            return Optional.empty();
-        }
-        
-        long size = size(physicalPath);
-        Instant lastModified = getLastModifiedTime(physicalPath, LinkOption.NOFOLLOW_LINKS).toInstant();
-        String contentType = probeContentType(physicalPath);
-        
-        Entity entity = new DefaultEntity(physicalPath, lastModified, size, contentType);
-        return Optional.of(entity);
-    }
+    public long getSize();
     
-    public Optional<Entity> of(String rawURI) throws IOException {
-        Objects.requireNonNull(rawURI);
-        return of(physicalPathOf(rawURI));
-    }
-    
-    Path physicalPathOf(String rawURI) {
-        if (rawURI.charAt(0) == '/') {
-            if (rawURI.length() > 1) {
-                rawURI = rawURI.substring(1);
-            } else {
-                rawURI = "";
-            }
-        }
-        return root.resolve(rawURI);
-    }
+    public String getContentType();
     
 }

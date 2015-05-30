@@ -23,19 +23,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.entity;
+package org.sil.body;
 
 import java.nio.file.Path;
 import java.time.Instant;
 
-final class DefaultEntity implements Entity {
+final class DefaultBody implements Body {
     
     private final Path physicalPath;
     private final long size;
     private final String contentType;
     private final Instant lastModified;
 
-    DefaultEntity(Path physicalPath, Instant lastModified, long size, String contentType) {
+    DefaultBody(Path physicalPath, Instant lastModified, long size, String contentType) {
         this.physicalPath = physicalPath;
         this.size = size;
         this.lastModified = lastModified;

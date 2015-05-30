@@ -23,8 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.entity;
+package org.sil.body;
 
+import org.sil.body.Body;
+import org.sil.body.BodyFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,20 +34,20 @@ import java.util.Optional;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
-public class TestEntityFactory {
+public class TestBodyFactory {
     
     final Path root = Paths.get(System.getProperty("user.dir"), "src/test/resources");
-    final EntityFactory ef = new EntityFactory(root);
+    final BodyFactory ef = new BodyFactory(root);
     
     
     @Test
     public void test_get_indexhtml() throws IOException {
         // We need to get rid of the /html
         String uri = "/index.html";
-        Optional<Entity> opt = ef.of(uri);
+        Optional<Body> opt = ef.of(uri);
         assertTrue(opt.isPresent());
         
-        Entity e = opt.get();
+        Body e = opt.get();
         System.out.println(e.getPhysicalPath());
         System.out.println(e.getContentType());
         System.out.println(e.getLastModified());
