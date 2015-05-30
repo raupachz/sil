@@ -41,6 +41,8 @@ import org.sil.util.Hex;
 
 public class HttpHandler implements Runnable {
     
+    private static final Logger logger = Logger.getLogger(HttpHandler.class.getName());
+    
     private final Configuration config;
     private final SocketChannel sc;
     private final Instant connectedAt;
@@ -69,48 +71,62 @@ public class HttpHandler implements Runnable {
     public void run() {
         ByteBuffer bb = getThread().getBuffer();
         bb.clear();
+//        try {
+//            // read everything into the buffer
+//            while (bb.hasRemaining() && sc.read(bb) != -1) ;
+//            bb.flip();
+//            
+//            if (config.isDebug()) {
+//                new Hex().dump(bb, System.out);
+//                bb.rewind();
+//            }
+//            
+//            Decoded dec = decoder.decode(bb);
+//            switch (dec.getResult()) {
+//                case Flawed : sc.close(); return;
+//                case Partial: sc.close(); return;
+//            }
+//            
+//            if (dec.getResult() == Decoded.Result.Successful) {
+//                Request request = dec.getRequest();
+//                Response response = processor.process(request);
+//            }
+//            
+//            // write the whole buffer
+//            bb.flip();
+//            while (bb.hasRemaining() && sc.write(bb) != -1) ;
+//            
+//            //Request request = decoder.decode(requestBuffer);
+//            //Response response = processor.process(request);
+//            //ByteBuffer responseBuffer = encoder.encode(response);
+//            //sc.write(responseBuffer);
+//            sc.close();
+//        } catch (IOException ex) {
+//            Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        
+        Request request = readRequest();
+        Response response = processor.process(request);
+        writeResponse(response);
+    }
+    
+    Request readRequest() {
+        return null;
+    }
+    
+    void writeResponse(Response response) {
         try {
-            // read everything into the buffer
-            while (bb.hasRemaining() && sc.read(bb) != -1) ;
+            ByteBuffer bb = getThread().getBuffer();
+            bb.clear();
+            encoder.encode(response, bb);
             bb.flip();
-            
-            if (config.isDebug()) {
-                new Hex().dump(bb, System.out);
-                bb.rewind();
+            while (bb.hasRemaining()) {
+                sc.write(bb);
             }
-            
-            Decoded dec = decoder.decode(bb);
-            switch (dec.getResult()) {
-                case Flawed : sc.close(); return;
-                case Partial: sc.close(); return;
-            }
-            
-            if (dec.getResult() == Decoded.Result.Successful) {
-                Request request = dec.getRequest();
-                Response response = processor.process(request);
-            }
-            
-            // write the whole buffer
-            bb.flip();
-            while (bb.hasRemaining() && sc.write(bb) != -1) ;
-            
-            //Request request = decoder.decode(requestBuffer);
-            //Response response = processor.process(request);
-            //ByteBuffer responseBuffer = encoder.encode(response);
-            //sc.write(responseBuffer);
             sc.close();
-        } catch (IOException ex) {
-            Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, e, () -> "Could not write response to channel.");
         }
-        
-    }
-    
-    void readRequest() {
-        
-    }
-    
-    void writeResponse() {
-        
     }
     
 }

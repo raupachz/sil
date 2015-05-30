@@ -25,8 +25,10 @@
  */
 package org.sil;
 
+import java.time.ZonedDateTime;
 import org.sil.request.Request;
 import org.sil.response.Response;
+import org.sil.util.Commons;
 
 /**
  * HTTP Request-Response Processor 
@@ -38,6 +40,10 @@ public class Processor {
                 .version(HttpVersion.HTTP11)
                 .code(500)
                 .phrase("Internal Server Error")
+                .header("Server", "sil/1.0")
+                .header("Date", Commons.RFC1123_DATE_TIME_FORMATTER.format(ZonedDateTime.now()))
+                .header("Content-Length", "0")
+                .header("Connection", "close")
                 .build();
     }
     

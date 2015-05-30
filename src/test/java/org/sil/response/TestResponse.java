@@ -23,44 +23,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.util;
+package org.sil.response;
 
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.NoSuchElementException;
+import java.time.ZonedDateTime;
+import org.sil.HttpVersion;
+import org.sil.util.Commons;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
-public final class Commons {
+public class TestResponse {
     
-    public static final Comparator<String[]> cmp = (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
-    
-    public static class IteratorImpl implements Iterator<String> {
-
-        private int i;
-        private final String[][] headers;
-
-        public IteratorImpl(String[][] headers) {
-            this.i = 0;
-            this.headers = headers;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return i < headers.length;
-        }
-
-        @Override
-        public String next() {
-            if (hasNext()) {
-                return headers[i++][0];
-            } else {
-                throw new NoSuchElementException("next");
-            }
-        }
+    @Test
+    public void test_Builder_build() {
+        Response response = new Response.Builder()
+                .version(HttpVersion.HTTP11)
+                .code(500)
+                .phrase("Internal Server Error")
+                .header("Connection", "close")
+                .header("Content-Length", "0")
+                .header("Date", Commons.RFC1123_DATE_TIME_FORMATTER.format(ZonedDateTime.now()))
+                .header("Server", "sil/1.0")
+                .build();
+        
+        assertEquals(response.getVersion(), HttpVersion.HTTP11);
+        assertEquals(response.getCode(), "500");
+        assertEquals(response.getPhrase(), "Internal Server Error");
+        assertEquals(response.getHeaderValue("Connection"), "close");
     }
     
-    public static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US).withZone(ZoneId.of("UTC"));
     
 }

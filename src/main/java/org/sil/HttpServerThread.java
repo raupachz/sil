@@ -28,6 +28,7 @@ package org.sil;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -37,10 +38,17 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import org.sil.config.Configuration;
+import java.util.logging.Logger;
 
+/**
+ * Accepts incoming socket connections and passes them on to a handler
+ */
 public class HttpServerThread extends Thread {
-
+    
+    private static final Logger logger = Logger.getLogger(HttpServerThread.class.getName());
+    
     private final Configuration config;
     private final ExecutorService es;
 
@@ -57,7 +65,7 @@ public class HttpServerThread extends Thread {
             ssc = ServerSocketChannel.open();
             ssc.bind(new InetSocketAddress(config.getPort()));
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.log(Level.SEVERE, e, () -> "Unable to bind to port: " + config.getPort());
             return;
         }
 
@@ -65,10 +73,12 @@ public class HttpServerThread extends Thread {
             try {
                 SocketChannel sc = ssc.accept();
                 sc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-                HttpHandler hh = new HttpHandler(config, sc);
-                es.execute(hh);
+                HttpHandler handler = new HttpHandler(config, sc);
+                es.execute(handler);
+            } catch (ClosedByInterruptException e) {
+                logger.log(Level.INFO, "No longer listening on port: {0}", config.getPort());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.log(Level.WARNING, e, () -> "Could not accept connection to this socket.");
             }
         }
 
@@ -90,6 +100,7 @@ public class HttpServerThread extends Thread {
         public Thread newThread(Runnable target) {
             ThreadGroup group = Thread.currentThread().getThreadGroup();
             String name = "http-" + counter.getAndIncrement();
+            logger.log(Level.INFO, "[{0}]", name);
             return new HttpThread(group, target, name);
         }
 

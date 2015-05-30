@@ -126,10 +126,12 @@ public class Response {
                 throw new NullPointerException("phrase");
             }
 
-            String[][] headers = new String[_stack.size()][];
-            for (int i = 0; i < _stack.size(); i++) {
+            final int n = _stack.size();
+            String[][] headers = new String[n][];
+            for (int i = 0; i < n; i++) {
                 headers[i] = _stack.pop();
             }
+            Arrays.sort(headers, Commons.cmp);
 
             Optional<Entity> entity = (_entity == null) ? Optional.empty() : Optional.of(_entity);
 
