@@ -33,15 +33,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 import org.sil.entity.Entity;
+import org.sil.util.Commons;
 
 /**
  * The {@code Request} class represents a HTTP response message. A Response is
  * immutable and thread-safe.
  */
 public class Response {
-
-    private static final Comparator<String[]> cmp
-            = (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
 
     private final HttpVersion version;
     private final String code;
@@ -70,12 +68,12 @@ public class Response {
     }
 
     public Iterable<String> getHeaderNames() {
-        return () -> new IteratorImpl();
+        return () -> new Commons.IteratorImpl(headers);
     }
 
     public String getHeaderValue(String header) {
         final String[] key = new String[]{header, null};
-        int i = Arrays.binarySearch(headers, key, cmp);
+        int i = Arrays.binarySearch(headers, key, Commons.cmp);
         return headers[i][1];
     }
 
@@ -141,29 +139,6 @@ public class Response {
             return new Response(_version, _code.toString(), _phrase, headers, entity);
         }
 
-    }
-
-    private class IteratorImpl implements Iterator<String> {
-
-        private int i;
-
-        private IteratorImpl() {
-            this.i = 0;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return i < headers.length;
-        }
-
-        @Override
-        public String next() {
-            if (hasNext()) {
-                return headers[i++][0];
-            } else {
-                throw new NoSuchElementException("next");
-            }
-        }
     }
 
 }

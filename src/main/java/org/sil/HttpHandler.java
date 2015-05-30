@@ -67,13 +67,6 @@ public class HttpHandler implements Runnable {
 
     @Override
     public void run() {
-        if (config.isDebug()) {
-            try {
-                System.out.println("* connection from " + sc.getRemoteAddress());
-            } catch (IOException ex) {
-                Logger.getLogger(HttpHandler.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
         ByteBuffer bb = getThread().getBuffer();
         bb.clear();
         try {
@@ -112,5 +105,12 @@ public class HttpHandler implements Runnable {
         
     }
     
+    void readRequest() {
+        
+    }
+    
+    void writeResponse() {
+        
+    }
     
 }

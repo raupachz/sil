@@ -29,7 +29,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Objects;
-import java.util.Optional;
 import org.sil.HttpVersion;
 import org.sil.request.Request.Method;
 

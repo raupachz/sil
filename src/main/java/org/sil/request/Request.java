@@ -26,12 +26,9 @@
 package org.sil.request;
 
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
-import org.sil.response.Response;
+import org.sil.util.Commons;
 
 /**
  * The {@code Request} class represents a HTTP request message.
@@ -43,9 +40,6 @@ public final class Request {
         GET,
         HEAD
     }
-    
-    private static final Comparator<String[]> cmp = 
-            (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
     
     private static final String[][] empty = new String[0][];
     
@@ -78,36 +72,13 @@ public final class Request {
     }
     
     public Iterable<String> getHeaderNames() {
-        return () -> new Request.IteratorImpl();
+        return () -> new Commons.IteratorImpl(headers);
     }
     
     public Optional<String> getHeaderValue(String header) {
         final String[] key = new String[] { header, null};
-        int i = Arrays.binarySearch(headers, key, cmp);
+        int i = Arrays.binarySearch(headers, key, Commons.cmp);
         return i < 0 ? Optional.empty() : Optional.of(headers[i][1]);
-    }
-    
-    private class IteratorImpl implements Iterator<String> {
-
-        private int i;
-
-        private IteratorImpl() {
-            this.i = 0;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return i < headers.length;
-        }
-
-        @Override
-        public String next() {
-            if (hasNext()) {
-                return headers[i++][0];
-            } else {
-                throw new NoSuchElementException("next");
-            }
-        }
     }
     
 }
