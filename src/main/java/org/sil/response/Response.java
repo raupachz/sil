@@ -27,9 +27,6 @@ package org.sil.response;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.sil.HttpVersion;
 import org.sil.entity.Entity;
