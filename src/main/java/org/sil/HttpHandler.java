@@ -146,4 +146,8 @@ public class HttpHandler implements Runnable {
         }
     }
     
+    public synchronized boolean isOpen() {
+        return sc.isOpen();
+    }
+    
 }

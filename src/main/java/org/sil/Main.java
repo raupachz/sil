@@ -53,20 +53,19 @@ public class Main {
         
         // Parse sil.properties
         Configuration config = new Configuration();
-
-        final HttpServerThread httpd = new HttpServerThread(config);
-
+        Server server = new Server(config);
+        // Shutdown via CTRL-C
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
                 out.println("Stopping sil");
-                httpd.interrupt();
+                server.stop();
             }
         });
 
         out.println("Starting sil/1.0 on port 8080 with directory .");
-        httpd.start();
+        server.start();
         out.println("Hit CTRL-C to stop");
     }
 
