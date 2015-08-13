@@ -28,6 +28,9 @@ package org.sil;
 import java.util.LinkedHashSet;
 import org.sil.config.Configuration;
 
+/**
+ * The Server binds all the pieces together
+ */
 public class Server {
     
     private final Configuration config;

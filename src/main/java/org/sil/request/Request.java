@@ -25,6 +25,8 @@
  */
 package org.sil.request;
 
+import java.net.InetAddress;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 import org.sil.HttpVersion;
@@ -43,20 +45,32 @@ public final class Request {
     
     private static final String[][] empty = new String[0][];
     
+    private final InetAddress remoteAddress;
     private final Method method;
     private final String uri;
     private final HttpVersion version;
     private final String[][] headers;
+    private final ZonedDateTime timestamp; 
     
     Request(Method method, String uri, HttpVersion version) {
-        this(method, uri, version, empty);
+        this(null, method, uri, version, empty);
     }
     
     Request(Method method, String uri, HttpVersion version, String[][] headers) {
+        this(null, method, uri, version, headers);
+    }
+    
+    Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version, String[][] headers) {
+        this.remoteAddress = remoteAddress;
         this.method = method;
         this.uri = uri;
         this.version = version;
         this.headers = headers;
+        this.timestamp = ZonedDateTime.now();
+    }
+    
+    public InetAddress getRemoteAddress() {
+        return remoteAddress;
     }
     
     public Method getMethod() {
@@ -69,6 +83,14 @@ public final class Request {
     
     public HttpVersion getVersion() {
         return version;
+    }
+    
+    public String getLine() {
+        return "";
+    }
+    
+    public ZonedDateTime getTimestamp() {
+        return timestamp;
     }
     
     public Iterable<String> getHeaderNames() {

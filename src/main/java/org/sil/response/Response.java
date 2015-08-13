@@ -25,6 +25,7 @@
  */
 package org.sil.response;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Optional;
@@ -43,6 +44,7 @@ public class Response {
     private final String phrase;
     private final String[][] headers;
     private final Optional<Body> entity;
+    private final ZonedDateTime timestamp;
 
     Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Body> entity) {
         this.version = version;
@@ -50,6 +52,7 @@ public class Response {
         this.phrase = phrase;
         this.headers = headers;
         this.entity = entity;
+        this.timestamp = ZonedDateTime.now();
     }
 
     public HttpVersion getVersion() {
@@ -77,6 +80,11 @@ public class Response {
     public Optional<Body> getEntity() {
         return entity;
     }
+    
+    public ZonedDateTime getTimestamp() {
+        return timestamp;
+    }
+            
 
     public static class Builder {
 

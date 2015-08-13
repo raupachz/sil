@@ -1,7 +1,14 @@
-# sil - Developing a webserver.
+sil
+===
 
 Guys, there is not much to see here. I always wanted do develop a web server.
-So this is me developing a web server. 
-I have no agenda, draft, or blueprint. It is just a fun spare time project.
+So this is me developing a web server. I have no agenda, draft, or blueprint. 
+It is just a fun spare time project.
+
+Running sil
+-----------
+
+Start sil, serve current directory and listen to port 8080
+`java -jar sil.jar`
 
 

@@ -25,13 +25,44 @@
  */
 package org.sil.log;
 
+import java.net.InetAddress;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.SignStyle;
+import java.time.temporal.TemporalField;
 import org.sil.request.Request;
 import org.sil.response.Response;
 
 public class AccessLog {
     
-    public void log(Request request, Response response) {
-        
+    final static DateTimeFormatter dtf;
+    
+    static {
+        dtf = new DateTimeFormatterBuilder()
+                .appendLiteral('[')
+                .appendLiteral(']')
+                .toFormatter();
     }
+    
+    public void log(StringBuilder sb, Request request, Response response) {
+        // IP address of the client (remote host) which made the request to the server.
+        String address = request.getRemoteAddress().getHostAddress();
+        sb.append(address);
+        // user-identifier & userid
+        sb.append(" - - ");
+        // timestamp
+        String ts = dtf.format(response.getTimestamp());
+        sb.append(ts);
+        // request line
+        sb.append(" \"")
+          .append(request.getLine())
+          .append("\" ");
+        // status code
+        sb.append(response.getCode());
+        // size of body
+        sb.append(23);
+    }
+    
+    
     
 }
