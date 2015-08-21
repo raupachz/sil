@@ -41,6 +41,7 @@ public class HttpHandler implements Runnable {
     
     private static final Logger logger = Logger.getLogger(HttpHandler.class.getName());
     
+    private final ByteBuffer buffer;
     private final Configuration config;
     private final SocketChannel sc;
     private final RequestDecoder decoder;
@@ -50,6 +51,7 @@ public class HttpHandler implements Runnable {
     private Instant lastReadWriteAt;
     
     public HttpHandler(Configuration config, SocketChannel sc) {
+        this.buffer = ByteBuffer.allocateDirect(4096);
         this.connectedAt = Instant.now();
         this.lastReadWriteAt = connectedAt;
         this.config = config;

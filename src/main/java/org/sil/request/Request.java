@@ -52,15 +52,19 @@ public final class Request {
     private final String[][] headers;
     private final ZonedDateTime timestamp; 
     
-    Request(Method method, String uri, HttpVersion version) {
+    public Request(Method method, String uri, HttpVersion version) {
         this(null, method, uri, version, empty);
     }
     
-    Request(Method method, String uri, HttpVersion version, String[][] headers) {
+    public Request(Method method, String uri, HttpVersion version, String[][] headers) {
         this(null, method, uri, version, headers);
     }
     
-    Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version, String[][] headers) {
+    public Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version) {
+        this(remoteAddress, method, uri, version, null);
+    }
+    
+     public Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version, String[][] headers) {
         this.remoteAddress = remoteAddress;
         this.method = method;
         this.uri = uri;
@@ -83,10 +87,6 @@ public final class Request {
     
     public HttpVersion getVersion() {
         return version;
-    }
-    
-    public String getLine() {
-        return "";
     }
     
     public ZonedDateTime getTimestamp() {

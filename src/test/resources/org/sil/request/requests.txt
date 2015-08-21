@@ -1,0 +1,7 @@
+01 ===
+GET /index.html HTTP/1.1
+Host: www.example.com
+Connection: keep-alive
+Cache-Control: no-cache
+Pragma: no-cache
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8

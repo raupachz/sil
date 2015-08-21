@@ -46,7 +46,7 @@ public class Response {
     private final Optional<Body> entity;
     private final ZonedDateTime timestamp;
 
-    Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Body> entity) {
+    public Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Body> entity) {
         this.version = version;
         this.code = code;
         this.phrase = phrase;

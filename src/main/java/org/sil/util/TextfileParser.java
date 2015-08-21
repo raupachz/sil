@@ -23,36 +23,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.log;
+package org.sil.util;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.time.ZonedDateTime;
-import org.sil.HttpVersion;
-import org.sil.request.Request;
-import org.sil.response.Response;
-import org.sil.util.Commons;
-import org.testng.annotations.Test;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class TestAccessLog {
+public class TextfileParser {
     
-    @Test
-    public void test_log() throws UnknownHostException {
-        Request request = new Request(InetAddress.getLocalHost(), Request.Method.GET, "/index.html", HttpVersion.HTTP11);
-        Response response = new Response.Builder()
-                .version(HttpVersion.HTTP11)
-                .code(200)
-                .phrase("Ok")
-                .header("Server", "sil/1.0")
-                .header("Date", Commons.RFC1123_DATE_TIME_FORMATTER.format(ZonedDateTime.now()))
-                .header("Content-Length", "0")
-                .header("Connection", "close")
-                .build();
+    private final Path src;
+    
+    public TextfileParser(Path src) {
+        this.src = src;
+    }
+    
+    public String[] parse()throws IOException {
+        // Read file and ignore comment lines
+        List<String> lines = Files.lines(src)
+             .filter(l -> l.startsWith("#"))
+             .collect(Collectors.toList());
         
-        AccessLogger log = new AccessLogger();
-        StringBuilder sb = new StringBuilder();
-        log.log(sb, request, response);
-        System.out.println(sb.toString());
+        // Merge sections
+        List<String> sections = new ArrayList<>();
+        for (int i = 0, j = 0; j < lines.size(); j++) {
+            String line = lines.get(i);
+            if (line.startsWith("<<<")) {
+                i = j;
+            }
+            if (line.startsWith(">>>")) {
+                String section = String.join("", lines.subList(i, j));
+                sections.add(section);
+            }
+        }
+        // Convert nonprintable ascii to binary
+//        for (i = 0; i < sections.size(); i++) {
+//            String s = sections.get(i);
+//            s = s.concat("\r\n");
+//            sections.set(i, s);
+//        }
+        return sections.toArray(new String[sections.size()]);
     }
     
 }

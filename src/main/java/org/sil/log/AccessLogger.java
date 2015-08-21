@@ -25,21 +25,33 @@
  */
 package org.sil.log;
 
-import java.net.InetAddress;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.SignStyle;
-import java.time.temporal.TemporalField;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
 import org.sil.request.Request;
 import org.sil.response.Response;
 
-public class AccessLog {
+public class AccessLogger {
     
     final static DateTimeFormatter dtf;
     
     static {
-        dtf = new DateTimeFormatterBuilder()
+        dtf = new DateTimeFormatterBuilder() 
                 .appendLiteral('[')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('/')
+                .appendText(ChronoField.MONTH_OF_YEAR, TextStyle.SHORT)
+                .appendLiteral('/')
+                .appendValue(ChronoField.YEAR)
+                .appendLiteral(':')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendLiteral(' ')
+                .appendOffset("+HHMM", "0000")
                 .appendLiteral(']')
                 .toFormatter();
     }
@@ -55,10 +67,15 @@ public class AccessLog {
         sb.append(ts);
         // request line
         sb.append(" \"")
-          .append(request.getLine())
+          .append(request.getMethod())
+          .append(" ")
+          .append(request.getURI())
+          .append(" ")
+          .append(request.getVersion())
           .append("\" ");
         // status code
         sb.append(response.getCode());
+        sb.append(" ");
         // size of body
         sb.append(23);
     }
