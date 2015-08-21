@@ -31,24 +31,25 @@ import java.util.ArrayDeque;
 import java.util.Objects;
 import org.sil.HttpVersion;
 import org.sil.request.Request.Method;
+import static org.sil.util.ASCII.*;
 
 public class RequestDecoder {
 
-    private static final byte d0 = 48;
-    private static final byte d1 = 49;
-
-    private static final byte E = 69;
-    private static final byte G = 71;
-    private static final byte H = 72;
-    private static final byte P = 80;
-    private static final byte T = 84;
-
-    private static final byte cr = 13; // \r
-    private static final byte lf = 10; // \n
-    private static final byte sp = 32; // SPACE
-    private static final byte dt = 46; // .
-    private static final byte sl = 47; // /
-    private static final byte cl = 58; // :
+//    private static final byte d0 = 48;
+//    private static final byte d1 = 49;
+//
+//    private static final byte E = 69;
+//    private static final byte G = 71;
+//    private static final byte H = 72;
+//    private static final byte P = 80;
+//    private static final byte T = 84;
+//
+//    private static final byte cr = 13; // \r
+//    private static final byte lf = 10; // \n
+//    private static final byte sp = 32; // SPACE
+//    private static final byte dt = 46; // .
+//    private static final byte sl = 47; // /
+//    private static final byte cl = 58; // :
 
     public Decoded decode(ByteBuffer bb) {
         Objects.requireNonNull(bb);
@@ -79,7 +80,7 @@ public class RequestDecoder {
         if (ba[0] == G
                 && ba[1] == E
                 && ba[2] == T
-                && ba[3] == sp) {
+                && ba[3] == SPACE) {
             method = Method.GET;
         } else {
             return Decoded.Flawed;
@@ -89,7 +90,7 @@ public class RequestDecoder {
         // Parse URI
         // --------------------------------------------------------------------
         p = method.name().length() + 1;
-        i = indexOf(sp, ba, p, limit);
+        i = indexOf(SPACE, ba, p, limit);
         if (i == -1) {
             return Decoded.Flawed;
         } else {
@@ -104,13 +105,13 @@ public class RequestDecoder {
                 && ba[p++] == T
                 && ba[p++] == T
                 && ba[p++] == P
-                && ba[p++] == sl
-                && ba[p++] == d1
-                && ba[p++] == dt) {
+                && ba[p++] == SLASH
+                && ba[p++] == $1
+                && ba[p++] == DOT) {
 
-            if (ba[p] == d1 && ba[++p] == cr && ba[++p] == lf) {
+            if (ba[p] == $1 && ba[++p] == CR && ba[++p] == LF) {
                 httpVersion = HttpVersion.HTTP11;
-            } else if (ba[p] == d0 && ba[++p] == cr && ba[++p] == lf) {
+            } else if (ba[p] == $0 && ba[++p] == CR && ba[++p] == LF) {
                 httpVersion = HttpVersion.HTTP10;
             } else {
                 return Decoded.Flawed;
@@ -123,9 +124,9 @@ public class RequestDecoder {
         // Parse Headers
         // --------------------------------------------------------------------
         p++;
-        while (ba[p] != cr && ba[p + 1] != lf) {
-            i = indexOf(cr, ba, p, limit);
-            j = indexOf(cl, ba, p, i);
+        while (ba[p] != CR && ba[p + 1] != LF) {
+            i = indexOf(CR, ba, p, limit);
+            j = indexOf(COLON, ba, p, i);
             
             name = new String(ba, p, j - p, StandardCharsets.UTF_8);
             value = new String(ba, j + 2, i - j, StandardCharsets.UTF_8);

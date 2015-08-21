@@ -28,34 +28,31 @@ package org.sil.response;
 import java.nio.ByteBuffer;
 import org.sil.HttpVersion;
 import static java.nio.charset.StandardCharsets.*;
+import static org.sil.util.ASCII.*;
 
 public class ResponseEncoder {
-
-    private static final byte sp = 32; // SPACE
-    private static final byte cr = 13; // \r
-    private static final byte lf = 10; // \n
-    private static final byte cl = 58; // :
 
     public void encode(Response response, ByteBuffer bb) {
         // Status line
         bb.put(HttpVersion.HTTP11.toString().getBytes(UTF_8))
-                .put(sp)
+                .put(SPACE)
                 .put(response.getCode().getBytes(UTF_8))
-                .put(sp)
+                .put(SPACE)
                 .put(response.getPhrase().getBytes(UTF_8))
-                .put(cr)
-                .put(lf);
+                .put(CR)
+                .put(LF);
+        // Response headers
         for (String name : response.getHeaderNames()) {
             String value = response.getHeaderValue(name);
             bb.put(name.getBytes(UTF_8));
-            bb.put(cl);
-            bb.put(sp);
+            bb.put(COLON);
+            bb.put(SPACE);
             bb.put(value.getBytes(UTF_8));
-            bb.put(cr);
-            bb.put(lf);
+            bb.put(CR);
+            bb.put(LF);
         }
-        bb.put(cr);
-        bb.put(lf);
+        bb.put(CR);
+        bb.put(LF);
     }
 
 }

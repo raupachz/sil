@@ -23,38 +23,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.body;
+package org.sil.entity;
 
-import org.sil.entity.Entity;
-import org.sil.entity.EntityFactory;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-import org.testng.annotations.Test;
-import static org.testng.Assert.*;
+import java.time.Instant;
 
-public class TestBodyFactory {
-    
-    final Path root = Paths.get(System.getProperty("user.dir"), "src/test/resources");
-    final EntityFactory ef = new EntityFactory(root);
-    
-    
-    @Test
-    public void test_get_indexhtml() throws IOException {
-        // We need to get rid of the /html
-        String uri = "/index.html";
-        Optional<Entity> opt = ef.of(uri);
-        assertTrue(opt.isPresent());
-        
-        Entity e = opt.get();
-        System.out.println(e.getPhysicalPath());
-        System.out.println(e.getContentType());
-        System.out.println(e.getLastModified());
-        System.out.println(e.getSize());
-        
-        
+public class CachedEntity implements Entity {
+
+    @Override
+    public Path getPhysicalPath() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
+    @Override
+    public Instant getLastModified() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long getSize() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getContentType() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

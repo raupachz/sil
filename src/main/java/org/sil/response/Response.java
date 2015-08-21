@@ -30,7 +30,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Optional;
 import org.sil.HttpVersion;
-import org.sil.body.Body;
+import org.sil.entity.Entity;
 import org.sil.util.Commons;
 
 /**
@@ -43,10 +43,10 @@ public class Response {
     private final String code;
     private final String phrase;
     private final String[][] headers;
-    private final Optional<Body> entity;
+    private final Optional<Entity> entity;
     private final ZonedDateTime timestamp;
 
-    public Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Body> entity) {
+    public Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Entity> entity) {
         this.version = version;
         this.code = code;
         this.phrase = phrase;
@@ -77,7 +77,7 @@ public class Response {
         return headers[i][1];
     }
 
-    public Optional<Body> getEntity() {
+    public Optional<Entity> getEntity() {
         return entity;
     }
     
@@ -92,7 +92,7 @@ public class Response {
         private Integer _code;
         private String _phrase;
         private final ArrayDeque<String[]> _stack;
-        private Body _entity;
+        private Entity _entity;
 
         public Builder() {
             this._stack = new ArrayDeque<>();
@@ -118,7 +118,7 @@ public class Response {
             return this;
         }
 
-        public Builder entity(Body entity) {
+        public Builder entity(Entity entity) {
             this._entity = entity;
             return this;
         }
@@ -141,7 +141,7 @@ public class Response {
             }
             Arrays.sort(headers, Commons.cmp);
 
-            Optional<Body> entity = (_entity == null) ? Optional.empty() : Optional.of(_entity);
+            Optional<Entity> entity = (_entity == null) ? Optional.empty() : Optional.of(_entity);
 
             return new Response(_version, _code.toString(), _phrase, headers, entity);
         }

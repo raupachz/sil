@@ -23,12 +23,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.body;
+package org.sil.entity;
 
 import java.nio.file.Path;
 import java.time.Instant;
 
-public interface Body {
+public interface Entity {
     
     public Path getPhysicalPath();
     

@@ -51,7 +51,7 @@ public class AccessLogger {
                 .appendLiteral(':')
                 .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
                 .appendLiteral(' ')
-                .appendOffset("+HHMM", "0000")
+                .appendOffset("+HHMM", "+0000")
                 .appendLiteral(']')
                 .toFormatter();
     }

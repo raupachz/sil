@@ -23,54 +23,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.body;
+package org.sil.entity;
 
-import java.io.IOException;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-import static java.nio.file.Files.*;
 
-public class BodyFactory {
+final class FileEntity implements Entity {
     
-    private final Path root;
-    
-    public BodyFactory(Path root) {
-        this.root = root;
+    private final Path physicalPath;
+    private final long size;
+    private final String contentType;
+    private final Instant lastModified;
+
+    FileEntity(Path physicalPath, Instant lastModified, long size, String contentType) {
+        this.physicalPath = physicalPath;
+        this.size = size;
+        this.lastModified = lastModified;
+        this.contentType = contentType;
     }
     
-    public Optional<Body> of(Path physicalPath) throws IOException {
-        Objects.requireNonNull(physicalPath);
-        
-        if (!exists(physicalPath, LinkOption.NOFOLLOW_LINKS)
-                || isDirectory(physicalPath, LinkOption.NOFOLLOW_LINKS)) {
-            return Optional.empty();
-        }
-        
-        long size = size(physicalPath);
-        Instant lastModified = getLastModifiedTime(physicalPath, LinkOption.NOFOLLOW_LINKS).toInstant();
-        String contentType = probeContentType(physicalPath);
-        
-        Body entity = new DefaultBody(physicalPath, lastModified, size, contentType);
-        return Optional.of(entity);
+    @Override
+    public Path getPhysicalPath() {
+        return physicalPath;
     }
-    
-    public Optional<Body> of(String rawURI) throws IOException {
-        Objects.requireNonNull(rawURI);
-        return of(physicalPathOf(rawURI));
+
+    @Override
+    public Instant getLastModified() {
+        return lastModified;
     }
-    
-    Path physicalPathOf(String rawURI) {
-        if (rawURI.charAt(0) == '/') {
-            if (rawURI.length() > 1) {
-                rawURI = rawURI.substring(1);
-            } else {
-                rawURI = "";
-            }
-        }
-        return root.resolve(rawURI);
+
+    @Override
+    public long getSize() {
+        return size;
+    }
+
+    @Override
+    public String getContentType() {
+        return contentType;
     }
     
 }
