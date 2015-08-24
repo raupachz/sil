@@ -47,27 +47,27 @@ public final class Request {
     
     private final InetAddress remoteAddress;
     private final Method method;
-    private final String uri;
+    private final String path;
     private final HttpVersion version;
     private final String[][] headers;
     private final ZonedDateTime timestamp; 
     
-    public Request(Method method, String uri, HttpVersion version) {
-        this(null, method, uri, version, empty);
+    public Request(Method method, String path, HttpVersion version) {
+        this(null, method, path, version, empty);
     }
     
-    public Request(Method method, String uri, HttpVersion version, String[][] headers) {
-        this(null, method, uri, version, headers);
+    public Request(Method method, String path, HttpVersion version, String[][] headers) {
+        this(null, method, path, version, headers);
     }
     
-    public Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version) {
-        this(remoteAddress, method, uri, version, null);
+    public Request(InetAddress remoteAddress, Method method, String path, HttpVersion version) {
+        this(remoteAddress, method, path, version, null);
     }
     
-     public Request(InetAddress remoteAddress, Method method, String uri, HttpVersion version, String[][] headers) {
+     public Request(InetAddress remoteAddress, Method method, String path, HttpVersion version, String[][] headers) {
         this.remoteAddress = remoteAddress;
         this.method = method;
-        this.uri = uri;
+        this.path = path;
         this.version = version;
         this.headers = headers;
         this.timestamp = ZonedDateTime.now();
@@ -81,8 +81,8 @@ public final class Request {
         return method;
     }
 
-    public String getURI() {
-        return uri;
+    public String getPath() {
+        return path;
     }
     
     public HttpVersion getVersion() {

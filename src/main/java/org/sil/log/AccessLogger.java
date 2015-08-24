@@ -69,7 +69,7 @@ public class AccessLogger {
         sb.append(" \"")
           .append(request.getMethod())
           .append(" ")
-          .append(request.getURI())
+          .append(request.getPath())
           .append(" ")
           .append(request.getVersion())
           .append("\" ");
