@@ -25,9 +25,7 @@
  */
 package org.sil.request;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import org.sil.HttpVersion;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
 
@@ -35,26 +33,26 @@ public class TestRequest {
     
     @Test
     public void test_getHeaderNames() {
-        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Request req = new Request(Request.Method.GET, "/", "HTTP/1.1");
     }
     
     @Test
     public void test_getHeaderValue_null() {
-        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Request req = new Request(Request.Method.GET, "/", "HTTP/1.1");
         Optional<String> opt = req.getHeaderValue(null);
         assertFalse(opt.isPresent());
     }
     
     @Test
     public void test_getHeaderValue_blank() {
-        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Request req = new Request(Request.Method.GET, "/", "HTTP/1.1");
         Optional<String> opt = req.getHeaderValue("");
         assertFalse(opt.isPresent());
     }
     
     @Test
     public void test_getHeaderValue_missing() {
-        Request req = new Request(Request.Method.GET, "/", HttpVersion.HTTP11);
+        Request req = new Request(Request.Method.GET, "/", "HTTP/1.1");
         Optional<String> opt = req.getHeaderValue("Host");
         assertFalse(opt.isPresent());
     }

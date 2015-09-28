@@ -25,7 +25,6 @@
  */
 package org.sil.util;
 
-import org.sil.util.Hex;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;

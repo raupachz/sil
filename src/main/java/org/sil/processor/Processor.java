@@ -23,30 +23,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
-
-import java.nio.ByteBuffer;
+package org.sil.processor;
 
 /**
- * An execution environment for {@code HttpHandler}.
+ * Performs the actual Request-Response-Cycle
  */
-public class HttpThread extends Thread {
-    
-    private static final ThreadLocal<ByteBuffer> threadLocal = new ThreadLocal<ByteBuffer>() {
-
-        @Override
-        protected ByteBuffer initialValue() {
-            return ByteBuffer.allocateDirect(4096);
-        }
-        
-    };
-
-    HttpThread(ThreadGroup group, Runnable target, String name) {
-        super(group, target, name);
-    }
-    
-    public ByteBuffer getBuffer() {
-        return threadLocal.get();
-    }
+public class Processor {
     
 }

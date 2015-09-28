@@ -29,7 +29,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Optional;
-import org.sil.HttpVersion;
 import org.sil.entity.Entity;
 import org.sil.util.Commons;
 
@@ -39,14 +38,14 @@ import org.sil.util.Commons;
  */
 public class Response {
 
-    private final HttpVersion version;
+    private final String version;
     private final String code;
     private final String phrase;
     private final String[][] headers;
     private final Optional<Entity> entity;
     private final ZonedDateTime timestamp;
 
-    public Response(HttpVersion version, String code, String phrase, String[][] headers, Optional<Entity> entity) {
+    public Response(String version, String code, String phrase, String[][] headers, Optional<Entity> entity) {
         this.version = version;
         this.code = code;
         this.phrase = phrase;
@@ -55,7 +54,7 @@ public class Response {
         this.timestamp = ZonedDateTime.now();
     }
 
-    public HttpVersion getVersion() {
+    public String getVersion() {
         return version;
     }
 
@@ -88,7 +87,7 @@ public class Response {
 
     public static class Builder {
 
-        private HttpVersion _version;
+        private String _version;
         private Integer _code;
         private String _phrase;
         private final ArrayDeque<String[]> _stack;
@@ -98,7 +97,7 @@ public class Response {
             this._stack = new ArrayDeque<>();
         }
 
-        public Builder version(HttpVersion version) {
+        public Builder version(String version) {
             this._version = version;
             return this;
         }

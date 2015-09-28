@@ -28,7 +28,6 @@ package org.sil;
 import org.sil.util.Getopt;
 import java.io.PrintStream;
 import static java.lang.System.*;
-import org.sil.config.Configuration;
 
 public class Main {
 
@@ -51,9 +50,7 @@ public class Main {
             }
         }
         
-        // Parse sil.properties
-        Configuration config = new Configuration();
-        Server server = new Server(config);
+        Server server = new Server();
         // Shutdown via CTRL-C
         Runtime.getRuntime().addShutdownHook(new Thread() {
 

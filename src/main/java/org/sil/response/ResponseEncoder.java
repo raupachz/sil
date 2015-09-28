@@ -26,7 +26,6 @@
 package org.sil.response;
 
 import java.nio.ByteBuffer;
-import org.sil.HttpVersion;
 import static java.nio.charset.StandardCharsets.*;
 import static org.sil.util.ASCII.*;
 
@@ -34,13 +33,14 @@ public class ResponseEncoder {
 
     public void encode(Response response, ByteBuffer bb) {
         // Status line
-        bb.put(HttpVersion.HTTP11.toString().getBytes(UTF_8))
+        bb.put(response.getVersion().getBytes(UTF_8))
                 .put(SPACE)
                 .put(response.getCode().getBytes(UTF_8))
                 .put(SPACE)
                 .put(response.getPhrase().getBytes(UTF_8))
                 .put(CR)
                 .put(LF);
+        
         // Response headers
         for (String name : response.getHeaderNames()) {
             String value = response.getHeaderValue(name);

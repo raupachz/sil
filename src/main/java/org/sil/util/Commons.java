@@ -27,12 +27,35 @@ package org.sil.util;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
 public final class Commons {
+    
+    public static final DateTimeFormatter ACCESS_LOG_FORMAT = new DateTimeFormatterBuilder() 
+                .appendLiteral('[')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('/')
+                .appendText(ChronoField.MONTH_OF_YEAR, TextStyle.SHORT)
+                .appendLiteral('/')
+                .appendValue(ChronoField.YEAR)
+                .appendLiteral(':')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendLiteral(' ')
+                .appendOffset("+HHMM", "+0000")
+                .appendLiteral(']')
+                .toFormatter();
+    
+    public static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US).withZone(ZoneId.of("UTC"));
     
     public static final Comparator<String[]> cmp = (final String[] sa1, final String[] sa2) -> sa1[0].compareTo(sa2[0]);
     
@@ -60,7 +83,5 @@ public final class Commons {
             }
         }
     }
-    
-    public static final DateTimeFormatter RFC1123_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US).withZone(ZoneId.of("UTC"));
     
 }

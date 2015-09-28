@@ -26,7 +26,6 @@
 package org.sil.response;
 
 import java.time.ZonedDateTime;
-import org.sil.HttpVersion;
 import org.sil.util.Commons;
 import org.testng.annotations.Test;
 import static org.testng.Assert.*;
@@ -36,7 +35,7 @@ public class TestResponse {
     @Test
     public void test_Builder_build() {
         Response response = new Response.Builder()
-                .version(HttpVersion.HTTP11)
+                .version("HTTP/1.1")
                 .code(500)
                 .phrase("Internal Server Error")
                 .header("Connection", "close")
@@ -45,7 +44,7 @@ public class TestResponse {
                 .header("Server", "sil/1.0")
                 .build();
         
-        assertEquals(response.getVersion(), HttpVersion.HTTP11);
+        assertEquals(response.getVersion(), "HTTP/1.1");
         assertEquals(response.getCode(), "500");
         assertEquals(response.getPhrase(), "Internal Server Error");
         assertEquals(response.getHeaderValue("Connection"), "close");

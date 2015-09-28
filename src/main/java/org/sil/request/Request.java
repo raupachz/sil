@@ -29,7 +29,6 @@ import java.net.InetAddress;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Optional;
-import org.sil.HttpVersion;
 import org.sil.util.Commons;
 
 /**
@@ -48,23 +47,23 @@ public final class Request {
     private final InetAddress remoteAddress;
     private final Method method;
     private final String path;
-    private final HttpVersion version;
+    private final String version;
     private final String[][] headers;
     private final ZonedDateTime timestamp; 
     
-    public Request(Method method, String path, HttpVersion version) {
+    public Request(Method method, String path, String version) {
         this(null, method, path, version, empty);
     }
     
-    public Request(Method method, String path, HttpVersion version, String[][] headers) {
+    public Request(Method method, String path, String version, String[][] headers) {
         this(null, method, path, version, headers);
     }
     
-    public Request(InetAddress remoteAddress, Method method, String path, HttpVersion version) {
+    public Request(InetAddress remoteAddress, Method method, String path, String version) {
         this(remoteAddress, method, path, version, null);
     }
     
-     public Request(InetAddress remoteAddress, Method method, String path, HttpVersion version, String[][] headers) {
+     public Request(InetAddress remoteAddress, Method method, String path, String version, String[][] headers) {
         this.remoteAddress = remoteAddress;
         this.method = method;
         this.path = path;
@@ -85,7 +84,7 @@ public final class Request {
         return path;
     }
     
-    public HttpVersion getVersion() {
+    public String getVersion() {
         return version;
     }
     

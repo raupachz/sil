@@ -23,16 +23,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil.config;
+package org.sil.request;
 
-public class Configuration {
+public class RequestDecoderException extends Exception {
     
-    public int getPort() {
-        return 8080;
-    }
-    
-    public boolean isDebug() {
-        return true;
+    public RequestDecoderException(String s) {
+        super(s);
     }
     
 }

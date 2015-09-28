@@ -25,20 +25,41 @@
  */
 package org.sil;
 
-public enum HttpVersion {
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.sil.log.AccessLogger;
+import org.sil.processor.Processor;
+import org.sil.request.RequestDecoder;
+import org.sil.response.ResponseEncoder;
 
-    HTTP10("HTTP/1.0"),
-    HTTP11("HTTP/1.1");
+public class Handler implements Runnable {
 
-    private final String version;
+    private static final Logger logger = Logger.getLogger(Handler.class.getName());
 
-    HttpVersion(String version) {
-        this.version = version;
+    private final SocketChannel channel;
+    private final ByteBuffer buffer;
+    private final RequestDecoder decoder;
+    private final ResponseEncoder encoder;
+
+    public Handler(SocketChannel channel) {
+        this.channel = channel;
+        this.buffer = ByteBuffer.allocateDirect(4096);
+        this.decoder = new RequestDecoder();
+        this.encoder = new ResponseEncoder();
     }
 
     @Override
-    public String toString() {
-        return version;
+    public void run() {
+        try {
+            int n = channel.read(buffer);
+            logger.info("read " + n + "bytes from channel");
+            buffer.clear();
+        } catch (IOException ex) {
+            Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

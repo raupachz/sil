@@ -25,37 +25,51 @@
  */
 package org.sil.request;
 
-public class Decoded {
+import java.util.NoSuchElementException;
+import java.util.Objects;
+
+public class Decoded<T> {
     
-    public static Decoded Partial = new Decoded(Result.Partial);
-    public static Decoded Flawed = new Decoded(Result.Flawed);
+    public static final Decoded DEFECTIVE = new Decoded(false, true);
+    public static final Decoded INCOMPLETE = new Decoded(true, false);
     
-    private final Result result;
-    private final Request request;
+    private final T value;
+    private final boolean incomplete;
+    private final boolean defective;
     
-    Decoded(Result result) {
-        this.result = result;
-        this.request = null;
+    private Decoded(boolean incomplete, boolean defective) {
+        this.value = null;
+        this.incomplete = incomplete;
+        this.defective = defective;
     }
     
-    Decoded(Request request) {
-        this.result = Result.Successful;
-        this.request = request;
+    public Decoded(T value) {
+        this.value = Objects.requireNonNull(value);
+        this.incomplete = false;
+        this.defective = false;
     }
     
-    public Result getResult() {
-        return result;
+    public T get() {
+        if (value == null) {
+            throw new NoSuchElementException();
+        }
+        return value;
     }
     
-    public Request getRequest() {
-        return request;
+    public boolean isPresent() {
+        return value != null;
     }
     
-    public enum Result {
-        Successful,
-        Partial,
-        Flawed
+    public boolean isIncomplete() {
+        return incomplete;
     }
     
+    public boolean isDefective() {
+        return defective;
+    }
+    
+    public boolean isDone() {
+        return false;
+    }
     
 }

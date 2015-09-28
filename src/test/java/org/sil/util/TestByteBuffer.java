@@ -23,28 +23,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.util;
 
-import java.time.ZonedDateTime;
-import org.sil.request.Request;
-import org.sil.response.Response;
-import org.sil.util.Commons;
+import java.nio.ByteBuffer;
+import org.testng.annotations.Test;
 
-/**
- * HTTP Request-Response Processor 
- */
-public class Processor {
+@Test
+public class TestByteBuffer {
     
-    public Response process(Request request) {
-        return new Response.Builder()
-                .version(HttpVersion.HTTP11)
-                .code(500)
-                .phrase("Internal Server Error")
-                .header("Server", "sil/1.0")
-                .header("Date", Commons.RFC1123_DATE_TIME_FORMATTER.format(ZonedDateTime.now()))
-                .header("Content-Length", "0")
-                .header("Connection", "close")
-                .build();
+    public void test_fb() {
+        int a = 1 << 31;
+        System.out.println(a);
+    }
+    
+    public void test_methods() {
+        byte b = 1;
+        ByteBuffer bb = ByteBuffer.allocate(2);
+        bb.put(b);
+        bb.put(b);
+        bb.flip();
+        
+        System.out.println("position = " + bb.position());
+        System.out.println("   limit = " + bb.limit());
+        System.out.println("capacity = " + bb.capacity());
+        System.out.println("remaining= " + bb.hasRemaining());
+        bb.get();
+        System.out.println("position = " + bb.position());
+        System.out.println("   limit = " + bb.limit());
+        
+        System.out.println("capacity = " + bb.capacity());
+        System.out.println("remaining= " + bb.hasRemaining());
     }
     
 }

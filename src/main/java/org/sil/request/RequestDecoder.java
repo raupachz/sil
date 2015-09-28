@@ -29,127 +29,163 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.Objects;
-import org.sil.HttpVersion;
+import java.util.Optional;
 import org.sil.request.Request.Method;
 import static org.sil.util.ASCII.*;
 
 public class RequestDecoder {
-
-//    private static final byte d0 = 48;
-//    private static final byte d1 = 49;
-//
-//    private static final byte E = 69;
-//    private static final byte G = 71;
-//    private static final byte H = 72;
-//    private static final byte P = 80;
-//    private static final byte T = 84;
-//
-//    private static final byte cr = 13; // \r
-//    private static final byte lf = 10; // \n
-//    private static final byte sp = 32; // SPACE
-//    private static final byte dt = 46; // .
-//    private static final byte sl = 47; // /
-//    private static final byte cl = 58; // :
-
-    public Decoded decode(ByteBuffer bb) {
-        Objects.requireNonNull(bb);
-
-        // Things we need to decode
-        Request request;
-        Request.Method method;
-        String rawURI;
-        HttpVersion httpVersion;
-
-        // Local variables and helpers
-        final ArrayDeque<String> st = new ArrayDeque<>();
-        String name, value;
-        final int limit = bb.limit();
-        int i, j, p;
-
-        // A minimal request has at least 16 bytes (GET / HTTP/1.1)
-        if (limit < 16) {
-            return Decoded.Flawed;
-        }
-
-        // Works because we use non-direct buffer. Not happy about this one.
-        byte[] ba = bb.array();
-
-        // --------------------------------------------------------------------
-        // Parse Method
-        // --------------------------------------------------------------------
-        if (ba[0] == G
-                && ba[1] == E
-                && ba[2] == T
-                && ba[3] == SPACE) {
-            method = Method.GET;
-        } else {
-            return Decoded.Flawed;
-        }
-
-        // --------------------------------------------------------------------
-        // Parse URI
-        // --------------------------------------------------------------------
-        p = method.name().length() + 1;
-        i = indexOf(SPACE, ba, p, limit);
-        if (i == -1) {
-            return Decoded.Flawed;
-        } else {
-            rawURI = new String(ba, p, i - p, StandardCharsets.UTF_8);
-        }
-        p = i + 1;
-        
-        // --------------------------------------------------------------------
-        // Parse HTTP-Version
-        // --------------------------------------------------------------------
-        if (ba[p++] == H
-                && ba[p++] == T
-                && ba[p++] == T
-                && ba[p++] == P
-                && ba[p++] == SLASH
-                && ba[p++] == $1
-                && ba[p++] == DOT) {
-
-            if (ba[p] == $1 && ba[++p] == CR && ba[++p] == LF) {
-                httpVersion = HttpVersion.HTTP11;
-            } else if (ba[p] == $0 && ba[++p] == CR && ba[++p] == LF) {
-                httpVersion = HttpVersion.HTTP10;
-            } else {
-                return Decoded.Flawed;
-            }
-        } else {
-            return Decoded.Flawed;
-        }
-
-        // --------------------------------------------------------------------
-        // Parse Headers
-        // --------------------------------------------------------------------
-        p++;
-        while (ba[p] != CR && ba[p + 1] != LF) {
-            i = indexOf(CR, ba, p, limit);
-            j = indexOf(COLON, ba, p, i);
-            
-            name = new String(ba, p, j - p, StandardCharsets.UTF_8);
-            value = new String(ba, j + 2, i - j, StandardCharsets.UTF_8);
-            
-            st.add(name);
-            st.add(value);
-            
-            p = i + 2;
-        }
-        
-        i = 0;
-        String[][] headers = new String[st.size() >> 1][];
-        while (!st.isEmpty()) {
-           headers[i++] = new String[] { st.pop(), st.pop() }; 
-        }
-        
-        request = new Request(method, rawURI, httpVersion, headers);
-        return new Decoded(request);
+    
+    private static final int TRUE  = 0;
+    private static final int FALSE = 1;
+    private static final int MAYBE = 2;
+    
+    enum State {
+        Successful,
+        Failed,
+        Incomplete
     }
+    
+    private State state;
+    private Request request;
+    
+//    public State decode() {
+//        Objects.requireNonNull(bb);
+//        
+//        // Things we need to decode
+//        Request request;
+//        Request.Method method;
+//        String path;
+//        String httpVersion;
+//        
+//
+//        // Local variables and helpers
+//        final ArrayDeque<String> st = new ArrayDeque<>();
+//        String name, value;
+//        final int limit = bb.limit();
+//        int o, i, j, p;
+//
+//        // --------------------------------------------------------------------
+//        // Parse Method
+//        // --------------------------------------------------------------------
+//        Decoded<Method> opt = method(bb);
+//        if (opt.isPresent()) {
+//            method = opt.get();
+//        } else if (opt.isIncomplete()) {
+//            return Optional.empty();
+//        } else {
+//            ;
+//        }
+//        
+//        // ----------------------------------------------------------------
+//        // Parse path
+//        // ----------------------------------------------------------------
+//        
+//        
+//        
+//        if (o == Successful) {
+//            
+//        } else if (o -)
+//        
+//        
+//        // --------------------------------------------------------------------
+//        // Parse URI
+//        // --------------------------------------------------------------------
+//        p = method.name().length() + 1;
+//        i = indexOf(SPACE, ba, p, limit);
+//        if (i == -1) {
+//            return Decoded.Flawed;
+//        } else {
+//            path = new String(ba, p, i - p, StandardCharsets.UTF_8);
+//        }
+//        p = i + 1;
+//        
+//        // --------------------------------------------------------------------
+//        // Parse HTTP-Version
+//        // --------------------------------------------------------------------
+//        if (ba[p++] == H
+//                && ba[p++] == T
+//                && ba[p++] == T
+//                && ba[p++] == P
+//                && ba[p++] == SLASH
+//                && ba[p++] == $1
+//                && ba[p++] == DOT) {
+//
+//            if (ba[p] == $1 && ba[++p] == CR && ba[++p] == LF) {
+//                httpVersion = HttpVersion.HTTP11;
+//            } else if (ba[p] == $0 && ba[++p] == CR && ba[++p] == LF) {
+//                httpVersion = HttpVersion.HTTP10;
+//            } else {
+//                return Decoded.Flawed;
+//            }
+//        } else {
+//            return Decoded.Flawed;
+//        }
+//
+//        // --------------------------------------------------------------------
+//        // Parse Headers
+//        // --------------------------------------------------------------------
+//        p++;
+//        while (ba[p] != CR && ba[p + 1] != LF) {
+//            i = indexOf(CR, ba, p, limit);
+//            j = indexOf(COLON, ba, p, i);
+//            
+//            name = new String(ba, p, j - p, StandardCharsets.UTF_8);
+//            value = new String(ba, j + 2, i - j, StandardCharsets.UTF_8);
+//            
+//            st.add(name);
+//            st.add(value);
+//            
+//            p = i + 2;
+//        }
+//        
+//        i = 0;
+//        String[][] headers = new String[st.size() >> 1][];
+//        while (!st.isEmpty()) {
+//           headers[i++] = new String[] { st.pop(), st.pop() }; 
+//        }
+//        
+//        request = new Request(method, rawURI, httpVersion, headers);
+//        return new Decoded(request);
+//    }
+    
+    
+    
+    // -- Helpers 
 
     int indexOf(byte b, byte[] src, int offset, int limit) {
         while (src[offset] != b && ++offset < limit);
         return offset == limit ? -1 : offset;
     }
-
+    
+    int matches(ByteBuffer bb, byte c) {
+        if (bb.hasRemaining()) {
+            byte b = bb.get();
+            if (b == c) {
+                return TRUE; // successful
+            } else {
+                return FALSE; // failed
+            }
+        } else {
+            if (bb.limit() == bb.capacity()) {
+                return FALSE; // there won't be more input
+            } else {
+                return MAYBE; // we need more input
+            }
+        }
+    }
+        
+        
+//        int result;
+//        final int n = Math.max(bb.remaining(), args.length);
+//        for (int i = 0; i < n; i++) {
+//            boolean match = bb.get() == args[i];
+//            if (!match) {
+//                return Flawed;
+//            }
+//        }
+//        result = (n == args.length) ? Successful : Partial;
+//        return result;
+//    }
+    
+   
 }

@@ -25,61 +25,48 @@
  */
 package org.sil;
 
-import org.sil.acceptor.Acceptor;
-import java.lang.management.ManagementFactory;
-import java.nio.channels.SocketChannel;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import org.sil.request.RequestDecoder;
-import org.sil.response.ResponseEncoder;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class Server {
+public class Workers extends ThreadPoolExecutor {
     
-    /* Configuration options */
-    private final int port = 8080;
-    private final int corePoolSize = 10;
-    private final int maximumPoolSize = 200;
-    private final long keepAliveTime = 60;
-    private final TimeUnit timeUnit = TimeUnit.SECONDS;
-    private final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue(100);
+    private final Server server;
     
-    /* Configuration options */
-    private final RequestDecoder decoder;
-    private final ResponseEncoder encoder;
+    private static final int corePoolSize = 10;
+    private static final int maximumPoolSize = 200;
+    private static final int keepAliveTime = 60;
 
-    /* Configuration options */
-    private final Acceptor acceptor;
-    private final Workers workers;
-
-    public Server() {
-        this.acceptor = new Acceptor(this);
-        this.workers = Workers.newInstance(this);
-        this.decoder = new RequestDecoder();
-        this.encoder = new ResponseEncoder();
+    Workers(Server server, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
+        this.server = server;
     }
+    
+    static class Factory implements ThreadFactory {
+        
+        private final AtomicInteger count = new AtomicInteger();
 
-    public void start() {
-        try {
-            workers.prestartAllCoreThreads();
-            
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName("org.sil:type=Acceptor");
-            mbs.registerMBean(acceptor, name);
-            acceptor.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "http-worker-" + count.getAndIncrement());
         }
     }
-
-    public void stop() {
-        acceptor.interrupt();
-    }
     
-    public void register(SocketChannel channel) {
+    static class Rejected implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            // We need to log something here
+        }
         
     }
-
+    
+    public static Workers newInstance(Server server) {
+        return new Workers(server, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100), new Factory(), new Rejected());
+    }
+    
 }

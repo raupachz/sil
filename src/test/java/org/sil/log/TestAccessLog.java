@@ -28,7 +28,6 @@ package org.sil.log;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
-import org.sil.HttpVersion;
 import org.sil.request.Request;
 import org.sil.response.Response;
 import org.sil.util.Commons;
@@ -38,9 +37,9 @@ public class TestAccessLog {
     
     @Test
     public void test_log() throws UnknownHostException {
-        Request request = new Request(InetAddress.getLocalHost(), Request.Method.GET, "/index.html", HttpVersion.HTTP11);
+        Request request = new Request(InetAddress.getLocalHost(), Request.Method.GET, "/index.html", "HTTP/1.1");
         Response response = new Response.Builder()
-                .version(HttpVersion.HTTP11)
+                .version("HTTP/1.1")
                 .code(200)
                 .phrase("Ok")
                 .header("Server", "sil/1.0")
@@ -49,7 +48,7 @@ public class TestAccessLog {
                 .header("Connection", "close")
                 .build();
         
-        AccessLogger log = new AccessLogger();
+        AccessLogger log = AccessLogger.INSTANCE;
         StringBuilder sb = new StringBuilder();
         log.log(sb, request, response);
         System.out.println(sb.toString());

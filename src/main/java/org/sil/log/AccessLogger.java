@@ -25,36 +25,13 @@
  */
 package org.sil.log;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.TextStyle;
-import java.time.temporal.ChronoField;
 import org.sil.request.Request;
 import org.sil.response.Response;
+import org.sil.util.Commons;
 
-public class AccessLogger {
+public enum AccessLogger {
     
-    final static DateTimeFormatter dtf;
-    
-    static {
-        dtf = new DateTimeFormatterBuilder() 
-                .appendLiteral('[')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .appendLiteral('/')
-                .appendText(ChronoField.MONTH_OF_YEAR, TextStyle.SHORT)
-                .appendLiteral('/')
-                .appendValue(ChronoField.YEAR)
-                .appendLiteral(':')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendLiteral(' ')
-                .appendOffset("+HHMM", "+0000")
-                .appendLiteral(']')
-                .toFormatter();
-    }
+    INSTANCE;
     
     public void log(StringBuilder sb, Request request, Response response) {
         // IP address of the client (remote host) which made the request to the server.
@@ -63,7 +40,7 @@ public class AccessLogger {
         // user-identifier & userid
         sb.append(" - - ");
         // timestamp
-        String ts = dtf.format(response.getTimestamp());
+        String ts = Commons.ACCESS_LOG_FORMAT.format(response.getTimestamp());
         sb.append(ts);
         // request line
         sb.append(" \"")
@@ -79,7 +56,5 @@ public class AccessLogger {
         // size of body
         sb.append(23);
     }
-    
-    
     
 }

@@ -25,7 +25,6 @@
  */
 package org.sil.util;
 
-import org.sil.util.Getopt;
 import java.util.Arrays;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

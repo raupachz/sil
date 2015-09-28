@@ -23,16 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.acceptor;
 
-/**
- * Disconnects stale handlers
- */
-public class DisconnectThread extends Thread {
-
-    @Override
-    public void run() {
-        
-    }
+public interface AcceptorMXBean {
+    
+    public int getPort();
     
 }
