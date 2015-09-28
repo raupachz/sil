@@ -23,9 +23,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.worker;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
@@ -33,20 +32,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Workers extends ThreadPoolExecutor {
+public class Workers extends ThreadPoolExecutor implements WorkersMXBean {
     
-    private final Server server;
-    
-    private static final int corePoolSize = 10;
-    private static final int maximumPoolSize = 200;
-    private static final int keepAliveTime = 60;
-
-    Workers(Server server, int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
-        this.server = server;
+    public Workers(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, 
+              maximumPoolSize, 
+              keepAliveTime, 
+              unit, 
+              workQueue, 
+              new DefaultThreadFactory() ,
+              new DefaultRejectedExecutionHandler());
     }
     
-    static class Factory implements ThreadFactory {
+    static class DefaultThreadFactory implements ThreadFactory {
         
         private final AtomicInteger count = new AtomicInteger();
 
@@ -56,7 +54,7 @@ public class Workers extends ThreadPoolExecutor {
         }
     }
     
-    static class Rejected implements RejectedExecutionHandler {
+    static class DefaultRejectedExecutionHandler implements RejectedExecutionHandler {
 
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
@@ -65,8 +63,9 @@ public class Workers extends ThreadPoolExecutor {
         
     }
     
-    public static Workers newInstance(Server server) {
-        return new Workers(server, corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100), new Factory(), new Rejected());
+    @Override
+    public int getActiveCount() {
+        return super.getActiveCount();
     }
     
 }

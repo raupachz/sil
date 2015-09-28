@@ -51,6 +51,7 @@ public class Main {
         }
         
         Server server = new Server();
+        
         // Shutdown via CTRL-C
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -62,6 +63,7 @@ public class Main {
         });
 
         out.println("Starting sil/1.0 on port 8080 with directory .");
+        server.initialize();
         server.start();
         out.println("Hit CTRL-C to stop");
     }

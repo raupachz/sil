@@ -23,15 +23,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sil;
+package org.sil.handler;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.sil.log.AccessLogger;
-import org.sil.processor.Processor;
+import org.sil.Server;
 import org.sil.request.RequestDecoder;
 import org.sil.response.ResponseEncoder;
 
@@ -39,26 +39,30 @@ public class Handler implements Runnable {
 
     private static final Logger logger = Logger.getLogger(Handler.class.getName());
 
+    private final Server server;
     private final SocketChannel channel;
-    private final ByteBuffer buffer;
     private final RequestDecoder decoder;
     private final ResponseEncoder encoder;
+    private final ByteBuffer buffer;
 
-    public Handler(SocketChannel channel) {
+    public Handler(Server server, SocketChannel channel, RequestDecoder decoder, ResponseEncoder encoder) {
+        this.server = server;
         this.channel = channel;
+        this.decoder = decoder;
+        this.encoder = encoder;
         this.buffer = ByteBuffer.allocateDirect(4096);
-        this.decoder = new RequestDecoder();
-        this.encoder = new ResponseEncoder();
     }
 
     @Override
     public void run() {
-        try {
-            int n = channel.read(buffer);
-            logger.info("read " + n + "bytes from channel");
+        while (!Thread.currentThread().isInterrupted()) {
             buffer.clear();
-        } catch (IOException ex) {
-            Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                int n = channel.read(buffer);
+                System.out.println(Thread.currentThread().getName() + " has read " + n + " bytes.");
+            } catch (IOException ex) {
+                Logger.getLogger(Handler.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

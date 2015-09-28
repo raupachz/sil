@@ -25,27 +25,35 @@
  */
 package org.sil;
 
+import org.sil.handler.Handler;
+import org.sil.worker.Workers;
 import org.sil.acceptor.Acceptor;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.management.OperationsException;
 import org.sil.request.RequestDecoder;
 import org.sil.response.ResponseEncoder;
 
 public class Server {
-    
+
     /* Configuration options */
     private final int port = 8080;
     private final int corePoolSize = 10;
     private final int maximumPoolSize = 200;
     private final long keepAliveTime = 60;
-    private final TimeUnit timeUnit = TimeUnit.SECONDS;
-    private final BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue(100);
-    
+    private final BlockingQueue<Runnable> handlerQueue = new ArrayBlockingQueue(100);
+
     /* Configuration options */
     private final RequestDecoder decoder;
     private final ResponseEncoder encoder;
@@ -56,30 +64,38 @@ public class Server {
 
     public Server() {
         this.acceptor = new Acceptor(this);
-        this.workers = Workers.newInstance(this);
+        this.workers = new Workers(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, handlerQueue);
         this.decoder = new RequestDecoder();
         this.encoder = new ResponseEncoder();
     }
 
-    public void start() {
+    public void initialize() {
         try {
-            workers.prestartAllCoreThreads();
-            
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName("org.sil:type=Acceptor");
-            mbs.registerMBean(acceptor, name);
-            acceptor.start();
-        } catch (Exception e) {
-            e.printStackTrace();
+            mbs.registerMBean(acceptor, new ObjectName("org.sil:type=Acceptor"));
+            mbs.registerMBean(workers,  new ObjectName("org.sil:type=Workers"));
+        } catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException | MalformedObjectNameException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void start() {
+        workers.prestartAllCoreThreads();
+        acceptor.start();
     }
 
     public void stop() {
         acceptor.interrupt();
+        workers.shutdown();
     }
-    
+
     public void register(SocketChannel channel) {
-        
+        Handler handler = new Handler(this, channel, decoder, encoder);
+        workers.submit(handler);
+    }
+
+    public int getPort() {
+        return port;
     }
 
 }

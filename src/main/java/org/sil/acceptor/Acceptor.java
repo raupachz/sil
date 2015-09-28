@@ -43,14 +43,14 @@ import org.sil.Server;
 public class Acceptor extends Thread implements AcceptorMXBean {
 
     private static final Logger logger = Logger.getLogger(Acceptor.class.getName());
-    /* The Server */
+
     private final Server server;
-    /* Configuration options */
-    private final int port = 8080;
+    private final int port;
 
     public Acceptor(Server server) {
         super("http-acceptor");
         this.server = server;
+        this.port = server.getPort();
     }
 
     @Override
